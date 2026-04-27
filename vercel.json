@@ -1,8 +1,8 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/",
-      "destination": "/World_Cup_2026_App.html"
+      "src": "^/$",
+      "dest": "/World_Cup_2026_App.html"
     }
   ]
 }
