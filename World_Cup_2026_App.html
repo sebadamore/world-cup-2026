@@ -365,7 +365,7 @@ a,button,[role="button"],input,select{transition:color var(--ease),background va
       <div class="step-divider"></div>
       <div class="step" id="step4"><span class="step-num">4</span><span class="step-label">Create events</span></div>
     </div>
-    <div class="auth-info">Scope: <code>calendar</code> · Times in <code>Europe/Madrid</code></div>
+    <div class="auth-info">Scope: <code>calendar</code> · Times in <code>Spain (Europe/Madrid)</code></div>
   </div>
 </div>
 
@@ -433,7 +433,7 @@ a,button,[role="button"],input,select{transition:color var(--ease),background va
     <div class="stat"><span class="stat-n" id="statShow">104</span><span class="stat-l">showing</span></div>
     <div class="stat"><span class="stat-n" id="statSaved">0</span><span class="stat-l">saved</span></div>
     <div class="stat"><span class="stat-n" id="statAdded">0</span><span class="stat-l">added to calendar</span></div>
-    <div class="stat-sep">All times Madrid (Europe/Madrid)</div>
+    <div class="stat-sep">All times Spain (Europe/Madrid)</div>
   </div>
 
   <!-- CONTROLS -->
@@ -905,7 +905,7 @@ async function insertEventToCalendar(m) {
   const event = {
     summary: title,
     location: `${m.v}, ${m.c}`,
-    description: `FIFA World Cup 2026™\nStage: ${m.s}\nVenue: ${m.v}\n${m.c}\n\nTimes listed in Madrid time (Europe/Madrid). Match duration approx. 2h.`,
+    description: `FIFA World Cup 2026™\nStage: ${m.s}\nVenue: ${m.v}\n${m.c}\n\nTimes listed in Spain time (Europe/Madrid). Match duration approx. 2h.`,
     start: { dateTime: startDT.toISOString(), timeZone: DISPLAY_TIMEZONE },
     end:   { dateTime: endDT.toISOString(),   timeZone: DISPLAY_TIMEZONE },
     reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: 60 }] },
@@ -961,7 +961,7 @@ function fmtDateLong(m) {
     timeZone: DISPLAY_TIMEZONE
   });
 }
-function fmtTimeMadrid(m) {
+function fmtTimeSpain(m) {
   return getMatchStartDate(m).toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
@@ -1109,7 +1109,7 @@ function card(m) {
   return `<div class="card${saved?' saved':''}${added?' adding':''}" data-id="${m.id}">
     <div class="card-meta">
       <span class="badge${fin?' fin':ko?' ko':''}">${stageLabel}</span>
-      <span class="card-date">${fmtDate(m)} · ${fmtTimeMadrid(m)} Madrid</span>
+      <span class="card-date">${fmtDate(m)} · ${fmtTimeSpain(m)} Spain</span>
     </div>
     <div class="teams">
       <div class="team"><span class="flag">${m.fh}</span><span class="tname">${m.h}</span></div>
@@ -1147,7 +1147,7 @@ function openModal(id) {
   const m = MATCHES.find(x => x.id === id);
   document.getElementById('modalInfo').innerHTML = `
     <div class="modal-teams">${m.fh} ${matchTitle(m)} ${m.fa}</div>
-    <div class="modal-meta">${fmtDateLong(m)} · ${fmtTimeMadrid(m)} Madrid<br>${m.v}, ${m.c}<br><strong>${m.s}</strong></div>
+    <div class="modal-meta">${fmtDateLong(m)} · ${fmtTimeSpain(m)} Spain<br>${m.v}, ${m.c}<br><strong>${m.s}</strong></div>
   `;
   // Show/dim API option based on auth state
   const apiOpt = document.getElementById('optGcal');
@@ -1202,7 +1202,7 @@ function renderPanel() {
       <div style="font-size:1.4rem">${m.fh}</div>
       <div class="saved-info">
         <div class="saved-title">${matchTitle(m)}</div>
-        <div class="saved-meta">${fmtDate(m)} · ${fmtTimeMadrid(m)} Madrid · ${m.v}</div>
+        <div class="saved-meta">${fmtDate(m)} · ${fmtTimeSpain(m)} Spain · ${m.v}</div>
         ${addedIds.has(m.id)?'<div class="saved-added">✓ Added to Google Calendar</div>':''}
       </div>
       <button class="btn btn-out btn-icon btn-sm" data-save="${m.id}" aria-label="Remove"><i data-lucide="x" style="width:13px;height:13px"></i></button>
