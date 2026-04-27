@@ -695,8 +695,8 @@ let tokenClient = null;
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
 const DISPLAY_TIMEZONE = 'Europe/Madrid';
-// Fixture source data is ET/EDT; June/July 2026 is +6h to Madrid.
-const ET_TO_MADRID_OFFSET_HOURS = 6;
+// Fixture source data is ET/EDT (UTC-4 in June/July 2026). Convert ET -> UTC first.
+const ET_TO_UTC_OFFSET_HOURS = 4;
 // Set your public calendar ID here, or pass it in URL: ?cal=...@group.calendar.google.com
 const OFFICIAL_CALENDAR_ID = 'e7316695eab1f2e6299afd87a4e0da67876183fbaa93b07fa04f8a1ea7bbf377@group.calendar.google.com';
 
@@ -941,7 +941,7 @@ function matchTitle(m) { return m.a ? `${m.h} vs ${m.a}` : m.h; }
 function getMatchStartDate(m) {
   const [year, month, day] = m.d.split('-').map(Number);
   const [hour, minute] = m.t.split(':').map(Number);
-  return new Date(Date.UTC(year, month - 1, day, hour + ET_TO_MADRID_OFFSET_HOURS, minute, 0, 0));
+  return new Date(Date.UTC(year, month - 1, day, hour + ET_TO_UTC_OFFSET_HOURS, minute, 0, 0));
 }
 
 function fmtDate(m) {
