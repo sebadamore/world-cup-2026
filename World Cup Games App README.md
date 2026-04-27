@@ -25,14 +25,14 @@ A fully client-side web app to browse all **104 official FIFA World Cup 2026 fix
 ### Option 1: Open directly in browser
 ```bash
 # No build tools needed — just open the file
-open world-cup-2026.html
+open "World Cup 2026 App.html"
 ```
 > ⚠️ For Google Calendar API OAuth2 to work, you must serve from a local HTTP server (not `file://`).
 
 ### Option 2: Serve locally (recommended)
 ```bash
 npx http-server . -p 8080 --cors
-# Then open: http://localhost:8080/world-cup-2026.html
+# Then open: http://localhost:8080/
 ```
 
 ### Option 3: Deploy to GitHub Pages
@@ -126,10 +126,9 @@ All times shown in Eastern Time (ET).
 
 ```
 world-cup-2026/
-├── world-cup-2026.html   # Main app (single-file)
-├── README.md
-├── LICENSE
-└── .gitignore
+├── index.html                    # Vercel/GitHub Pages entrypoint
+├── World Cup 2026 App.html       # Main app (single-file)
+└── World Cup Games App README.md
 ```
 
 ---
