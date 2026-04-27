@@ -348,7 +348,7 @@ a,button,[role="button"],input,select{transition:color var(--ease),background va
       </div>
       <div class="setup-step">
         <div class="setup-step-head"><div class="setup-step-n">2</div><div class="setup-step-title">Create OAuth2 Client ID</div></div>
-        <p>APIs &amp; Services → Credentials → Create Credentials → <code>OAuth Client ID</code>. App type: <code>Web application</code>. Add <code>http://localhost:8080</code> or your domain to Authorized JavaScript Origins.</p>
+        <p>APIs &amp; Services → Credentials → Create Credentials → <code>OAuth Client ID</code>. App type: <code>Web application</code>. Add <code>http://localhost:8080</code> and your exact deployed origin (for example <code>https://world-cup-2026-one.vercel.app</code>) to Authorized JavaScript Origins.</p>
       </div>
       <div class="setup-step">
         <div class="setup-step-head"><div class="setup-step-n">3</div><div class="setup-step-title">Create an API Key</div></div>
@@ -645,6 +645,31 @@ let tokenClient = null;
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
 
+function authTroubleshooting(errorCode, details = '') {
+  const origin = window.location.origin;
+  const byCode = {
+    origin_mismatch: `Origin mismatch. Add "${origin}" to Google Cloud -> OAuth Client -> Authorized JavaScript origins.`,
+    invalid_client: 'OAuth client ID is invalid. Check you pasted the full *.apps.googleusercontent.com value.',
+    unauthorized_client: 'OAuth client is not authorized for this flow. Ensure it is a "Web application" client.',
+    access_denied: 'Google account denied the permission request. Retry and approve calendar scope.',
+    popup_closed_by_user: 'Google popup was closed before completing auth.',
+    popup_failed_to_open: 'Popup was blocked by the browser. Allow popups for this site and retry.',
+    idpiframe_initialization_failed: 'Google identity iframe failed to initialize (often due to browser privacy blockers).',
+  };
+  const lower = String(details || '').toLowerCase();
+  if (byCode[errorCode]) return byCode[errorCode];
+  if (lower.includes('api key not valid')) {
+    return 'API key is invalid. Use a Browser API key from the same Google Cloud project.';
+  }
+  if (lower.includes('referer') || lower.includes('referrer')) {
+    return `API key referrer restriction blocked this origin. Add "${origin}/*" to allowed referrers or temporarily remove restrictions while testing.`;
+  }
+  if (lower.includes('access blocked') || lower.includes('not configured')) {
+    return 'OAuth consent screen may be incomplete. Configure Branding + Data Access and publish/testing users in Google Cloud.';
+  }
+  return 'Check OAuth client type, API key restrictions, Calendar API enabled, and authorized origins.';
+}
+
 // ═══════════════════════════════════════════════════════
 // LOGGING
 // ═══════════════════════════════════════════════════════
@@ -696,6 +721,7 @@ document.getElementById('loadApiBtn').addEventListener('click', async () => {
   setStep(2);
   setGcalStatus('loading');
   log('→ STEP 1: Credentials received. Loading GAPI + GIS libraries…', 'info');
+  log(`  Current origin: ${window.location.origin}`, 'info');
   loadGapiScript(clientId, apiKey);
   loadGisScript(clientId);
 });
@@ -718,8 +744,11 @@ function loadGapiScript(clientId, apiKey) {
         log('✓ gapi.client initialized — Calendar API discovery doc loaded', 'ok');
         maybeReady();
       } catch(e) {
-        log('✗ gapi.client.init error: ' + e.message, 'err');
-        toast('GAPI init error: ' + e.message, 'err');
+        const raw = e?.result?.error?.message || e?.message || 'Unknown error';
+        const hint = authTroubleshooting('', raw);
+        log('✗ gapi.client.init error: ' + raw, 'err');
+        log('  Hint: ' + hint, 'warn');
+        toast('GAPI init failed. Check API key/origin setup.', 'err');
       }
     });
   };
@@ -768,8 +797,11 @@ function maybeReady() {
 // ═══════════════════════════════════════════════════════
 function handleTokenResponse(resp) {
   if (resp.error) {
-    log('✗ OAuth2 error: ' + resp.error + ' — ' + (resp.error_description || ''), 'err');
-    toast('Auth failed: ' + resp.error, 'err');
+    const details = resp.error_description || '';
+    const hint = authTroubleshooting(resp.error, details);
+    log('✗ OAuth2 error: ' + resp.error + ' — ' + details, 'err');
+    log('  Hint: ' + hint, 'warn');
+    toast('Auth failed: ' + resp.error + '. See API log for fix.', 'err');
     setStep(3);
     return;
   }
