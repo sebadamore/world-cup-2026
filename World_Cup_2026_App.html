@@ -72,6 +72,16 @@ a,button,[role="button"],input,select{transition:color var(--ease),background va
 .theme-btn{color:var(--tx2);padding:var(--s2);border-radius:var(--r2);width:34px;height:34px;display:flex;align-items:center;justify-content:center}
 .theme-btn:hover{color:var(--tx);background:var(--dyn)}
 
+/* ── SUBSCRIBE SECTION ─────────────────────────────────── */
+.subscribe-section{padding:var(--s6);border-bottom:1px solid var(--div);background:linear-gradient(135deg,color-mix(in oklch,var(--ok) 10%,var(--bg)) 0%,var(--bg) 65%)}
+.subscribe-inner{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:var(--s6);align-items:start}
+.subscribe-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s5);box-shadow:var(--sh1)}
+.subscribe-title{font-family:var(--fd);font-size:clamp(1.8rem,1.2rem + 1.5vw,2.5rem);letter-spacing:.04em;line-height:1}
+.subscribe-copy{margin-top:var(--s3);color:var(--tx2);max-width:52ch}
+.subscribe-actions{display:flex;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s4)}
+.subscribe-note{font-size:var(--xs);color:var(--tx2);margin-top:var(--s3)}
+.calendar-embed{width:100%;min-height:320px;border:0;border-radius:var(--r2);background:var(--surface2)}
+
 /* ── HERO ──────────────────────────────────────────────── */
 .hero{background:linear-gradient(135deg,color-mix(in oklch,var(--pr) 10%,var(--bg)) 0%,var(--bg) 55%,color-mix(in oklch,var(--gold) 6%,var(--bg)) 100%);padding:var(--s10) var(--s6) var(--s8);border-bottom:1px solid var(--div)}
 .hero-inner{max-width:1240px;margin:0 auto;display:flex;gap:var(--s8);align-items:center;flex-wrap:wrap}
@@ -80,8 +90,6 @@ a,button,[role="button"],input,select{transition:color var(--ease),background va
 .hero-kpis{display:flex;gap:var(--s6);flex-wrap:wrap;margin-top:var(--s5)}
 .kpi-num{font-family:var(--fd);font-size:clamp(2rem,.5rem + 3vw,3rem);color:var(--pr);line-height:1}
 .kpi-lbl{font-size:var(--xs);color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
-.trophy{margin-left:auto;filter:drop-shadow(0 6px 24px color-mix(in oklch,var(--gold) 35%,transparent))}
-.trophy-img{width:clamp(4rem,2rem + 5vw,7rem);height:auto;display:block}
 
 /* ── AUTH BANNER ────────────────────────────────────────── */
 .auth-banner{background:var(--surface);border-bottom:1px solid var(--div);padding:var(--s3) var(--s6)}
@@ -263,8 +271,10 @@ a,button,[role="button"],input,select{transition:color var(--ease),background va
 /* ── RESPONSIVE ───────────────────────────────────────────── */
 @media(max-width:768px){
   .topbar{padding:var(--s3) var(--s4)}
+  .subscribe-section{padding:var(--s4)}
+  .subscribe-inner{grid-template-columns:1fr}
+  .calendar-embed{min-height:260px}
   .hero{padding:var(--s8) var(--s4) var(--s6)}
-  .trophy{display:none}
   .main{padding:var(--s4)}
   .panel{width:100vw;max-width:100vw}
   .creds-form{grid-template-columns:1fr}
@@ -313,6 +323,36 @@ a,button,[role="button"],input,select{transition:color var(--ease),background va
   </div>
 </header>
 
+<!-- ── SUBSCRIBE CALENDAR ─────────────────────────────── -->
+<section class="subscribe-section" aria-label="Subscribe to official calendar">
+  <div class="subscribe-inner">
+    <div class="subscribe-card">
+      <h2 class="subscribe-title">Subscribe to the Official Calendar</h2>
+      <p class="subscribe-copy">
+        Add all World Cup fixtures to your Google Calendar in one click. Subscribing once keeps your calendar updated automatically.
+      </p>
+      <div class="subscribe-actions">
+        <a class="btn btn-gcal" target="_blank" rel="noopener noreferrer" href="https://calendar.google.com/calendar/r?cid=e7316695eab1f2e6299afd87a4e0da67876183fbaa93b07fa04f8a1ea7bbf377%40group.calendar.google.com">
+          <i data-lucide="calendar-plus" style="width:14px;height:14px"></i>
+          Subscribe in Google Calendar
+        </a>
+        <a class="btn btn-out" target="_blank" rel="noopener noreferrer" href="https://calendar.google.com/calendar/embed?src=e7316695eab1f2e6299afd87a4e0da67876183fbaa93b07fa04f8a1ea7bbf377%40group.calendar.google.com&ctz=Europe%2FMadrid">
+          <i data-lucide="external-link" style="width:14px;height:14px"></i>
+          Open Calendar
+        </a>
+      </div>
+      <p class="subscribe-note">Calendar ID: <code>e7316695eab1f2e6299afd87a4e0da67876183fbaa93b07fa04f8a1ea7bbf377@group.calendar.google.com</code></p>
+    </div>
+
+    <iframe
+      class="calendar-embed"
+      src="https://calendar.google.com/calendar/embed?src=e7316695eab1f2e6299afd87a4e0da67876183fbaa93b07fa04f8a1ea7bbf377%40group.calendar.google.com&ctz=Europe%2FMadrid"
+      title="Official World Cup calendar"
+      scrolling="no">
+    </iframe>
+  </div>
+</section>
+
 <!-- ── AUTH PROGRESS BANNER ────────────────────────────── -->
 <div class="auth-banner">
   <div class="auth-banner-inner">
@@ -342,7 +382,6 @@ a,button,[role="button"],input,select{transition:color var(--ease),background va
         <div><div class="kpi-num" id="daysKpi">—</div><div class="kpi-lbl">Days to go</div></div>
       </div>
     </div>
-    <div class="trophy" aria-hidden="true"><img id="trophyImg" class="trophy-img" alt="World Cup trophy"/></div>
   </div>
 </section>
 
@@ -655,29 +694,12 @@ let gisInited = false;
 let tokenClient = null;
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
-// Optional: set a fixed trophy image data URL here.
-const TROPHY_IMAGE_DATA_URI = '';
 // Set your public calendar ID here, or pass it in URL: ?cal=...@group.calendar.google.com
 const OFFICIAL_CALENDAR_ID = 'e7316695eab1f2e6299afd87a4e0da67876183fbaa93b07fa04f8a1ea7bbf377@group.calendar.google.com';
 
 function getOfficialCalendarId() {
   const p = new URLSearchParams(window.location.search);
   return (p.get('cal') || p.get('officialCalendarId') || OFFICIAL_CALENDAR_ID || '').trim();
-}
-
-function getTrophyImageSrc() {
-  const p = new URLSearchParams(window.location.search);
-  return (p.get('trophy') || TROPHY_IMAGE_DATA_URI || '').trim();
-}
-
-function setupTrophyImage() {
-  const img = document.getElementById('trophyImg');
-  const src = getTrophyImageSrc();
-  if (!src) {
-    img.src = 'https://www.clipartmax.com/png/middle/135-1350810_trophy-clipart-soccer-world-cup-fifa-world-cup-2010-trophy.png';
-    return;
-  }
-  img.src = src;
 }
 
 function getOfficialCalendarSubscribeUrl() {
@@ -1252,7 +1274,6 @@ document.getElementById('groupSel').addEventListener('change', e => { groupFilte
 // ═══════════════════════════════════════════════════════
 renderMatches();
 setupOfficialCalendarCTA();
-setupTrophyImage();
 lucide.createIcons();
 </script>
 </body>
