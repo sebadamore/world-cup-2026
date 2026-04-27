@@ -10,6 +10,7 @@ A fully client-side web app to browse all **104 official FIFA World Cup 2026 fix
 
 - **📅 All 104 Matches** — Group Stage (Groups A–L), Round of 32, Round of 16, Quarterfinals, Semifinals, Third Place, and Final
 - **🔗 Google Calendar API** — Direct OAuth2 integration using GAPI + Google Identity Services (GIS) — the official Google JS quickstart pattern
+- **👥 Public Calendar Subscribe** — Share one public calendar with friends via the in-app Subscribe button (no OAuth required for them)
 - **🔓 3 Calendar Options** — Via API (direct insert), browser link (no auth needed), or `.ics` download
 - **💾 Save & Batch Add** — Save multiple matches, then batch-add all to Google Calendar at once
 - **📁 .ics Export** — Download single or all saved matches for Apple Calendar / Outlook
@@ -25,7 +26,7 @@ A fully client-side web app to browse all **104 official FIFA World Cup 2026 fix
 ### Option 1: Open directly in browser
 ```bash
 # No build tools needed — just open the file
-open "World Cup 2026 App.html"
+open "World_Cup_2026_App.html"
 ```
 > ⚠️ For Google Calendar API OAuth2 to work, you must serve from a local HTTP server (not `file://`).
 
@@ -127,13 +128,28 @@ All times shown in Eastern Time (ET).
 ```
 world-cup-2026/
 ├── index.html                    # Vercel/GitHub Pages entrypoint
-├── World Cup 2026 App.html       # Main app (single-file)
+├── World_Cup_2026_App.html       # Main app (single-file)
 └── World Cup Games App README.md
 ```
 
 ---
 
 ## 🌐 Deploy
+
+### Share a public calendar with friends
+Set a public calendar ID in `World_Cup_2026_App.html`:
+
+```js
+const OFFICIAL_CALENDAR_ID = 'your_calendar_id@group.calendar.google.com';
+```
+
+Or pass it via URL (no code changes required):
+
+```text
+https://world-cup-2026-one.vercel.app/?cal=your_calendar_id@group.calendar.google.com
+```
+
+The top-bar **Subscribe** button will open Google Calendar and let users subscribe to that public calendar.
 
 ### GitHub Pages
 ```bash

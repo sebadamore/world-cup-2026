@@ -296,6 +296,10 @@ a,button,[role="button"],input,select{transition:color var(--ease),background va
       Saved
       <span class="badge-dot" id="badgeDot">0</span>
     </button>
+    <a class="btn btn-gcal btn-sm" id="subscribeOfficialBtn" href="#" target="_blank" rel="noopener noreferrer" title="Subscribe to the shared World Cup calendar">
+      <i data-lucide="calendar-plus" style="width:14px;height:14px"></i>
+      Subscribe
+    </a>
     <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
@@ -644,6 +648,30 @@ let gisInited = false;
 let tokenClient = null;
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
+// Set your public calendar ID here, or pass it in URL: ?cal=...@group.calendar.google.com
+const OFFICIAL_CALENDAR_ID = '';
+
+function getOfficialCalendarId() {
+  const p = new URLSearchParams(window.location.search);
+  return (p.get('cal') || p.get('officialCalendarId') || OFFICIAL_CALENDAR_ID || '').trim();
+}
+
+function getOfficialCalendarSubscribeUrl() {
+  const calendarId = getOfficialCalendarId();
+  if (!calendarId) return '';
+  return `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(calendarId)}`;
+}
+
+function setupOfficialCalendarCTA() {
+  const btn = document.getElementById('subscribeOfficialBtn');
+  const subscribeUrl = getOfficialCalendarSubscribeUrl();
+  if (subscribeUrl) {
+    btn.href = subscribeUrl;
+    btn.title = 'Subscribe to the shared World Cup calendar';
+    return;
+  }
+  btn.hidden = true;
+}
 
 function authTroubleshooting(errorCode, details = '') {
   const origin = window.location.origin;
@@ -1196,6 +1224,7 @@ document.getElementById('groupSel').addEventListener('change', e => { groupFilte
 // INIT
 // ═══════════════════════════════════════════════════════
 renderMatches();
+setupOfficialCalendarCTA();
 lucide.createIcons();
 </script>
 </body>
