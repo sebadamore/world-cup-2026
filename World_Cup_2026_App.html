@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -79,7 +80,8 @@ a,button,[role="button"],input,select{transition:color var(--ease),background va
 .hero-kpis{display:flex;gap:var(--s6);flex-wrap:wrap;margin-top:var(--s5)}
 .kpi-num{font-family:var(--fd);font-size:clamp(2rem,.5rem + 3vw,3rem);color:var(--pr);line-height:1}
 .kpi-lbl{font-size:var(--xs);color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
-.trophy{font-size:clamp(4rem,2rem + 5vw,7rem);margin-left:auto;filter:drop-shadow(0 6px 24px color-mix(in oklch,var(--gold) 35%,transparent))}
+.trophy{margin-left:auto;filter:drop-shadow(0 6px 24px color-mix(in oklch,var(--gold) 35%,transparent))}
+.trophy-img{width:clamp(4rem,2rem + 5vw,7rem);height:auto;display:block}
 
 /* ── AUTH BANNER ────────────────────────────────────────── */
 .auth-banner{background:var(--surface);border-bottom:1px solid var(--div);padding:var(--s3) var(--s6)}
@@ -340,7 +342,7 @@ a,button,[role="button"],input,select{transition:color var(--ease),background va
         <div><div class="kpi-num" id="daysKpi">—</div><div class="kpi-lbl">Days to go</div></div>
       </div>
     </div>
-    <div class="trophy" aria-hidden="true">🏆</div>
+    <div class="trophy" aria-hidden="true"><img id="trophyImg" class="trophy-img" alt="World Cup trophy"/></div>
   </div>
 </section>
 
@@ -653,12 +655,29 @@ let gisInited = false;
 let tokenClient = null;
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/calendar';
+// Optional: set a fixed trophy image data URL here.
+const TROPHY_IMAGE_DATA_URI = '';
 // Set your public calendar ID here, or pass it in URL: ?cal=...@group.calendar.google.com
 const OFFICIAL_CALENDAR_ID = 'e7316695eab1f2e6299afd87a4e0da67876183fbaa93b07fa04f8a1ea7bbf377@group.calendar.google.com';
 
 function getOfficialCalendarId() {
   const p = new URLSearchParams(window.location.search);
   return (p.get('cal') || p.get('officialCalendarId') || OFFICIAL_CALENDAR_ID || '').trim();
+}
+
+function getTrophyImageSrc() {
+  const p = new URLSearchParams(window.location.search);
+  return (p.get('trophy') || TROPHY_IMAGE_DATA_URI || '').trim();
+}
+
+function setupTrophyImage() {
+  const img = document.getElementById('trophyImg');
+  const src = getTrophyImageSrc();
+  if (!src) {
+    img.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/FIFA_World_Cup_Trophy_%28Jules_Rimet%29.svg/512px-FIFA_World_Cup_Trophy_%28Jules_Rimet%29.svg.png';
+    return;
+  }
+  img.src = src;
 }
 
 function getOfficialCalendarSubscribeUrl() {
@@ -874,7 +893,7 @@ async function insertEventToCalendar(m) {
   log(`  POST https://www.googleapis.com/calendar/v3/calendars/primary/events`, 'info');
 
   try {
-    const resp = await gapi.client.calendar.events.insert({ calendarId: 'primary', resource: event });
+    const resp = await gapi.client.calendar.events.insert({ calendarId: getOfficialCalendarId() || 'primary', resource: event });
     const created = resp.result;
     log(`✓ Event created: ${created.summary}`, 'ok');
     log(`  Event ID: ${created.id}`, 'ok');
@@ -916,7 +935,9 @@ function gcalLink(m) {
   const title = encodeURIComponent(`⚽ ${matchTitle(m)} – FIFA World Cup 2026`);
   const loc   = encodeURIComponent(`${m.v}, ${m.c}`);
   const desc  = encodeURIComponent(`FIFA World Cup 2026 | ${m.s} | ${m.v}, ${m.c}`);
-  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(start)}/${fmt(end)}&details=${desc}&location=${loc}`;
+  const cid = getOfficialCalendarId();
+  const src = cid ? `&src=${encodeURIComponent(cid)}` : '';
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(start)}/${fmt(end)}&details=${desc}&location=${loc}${src}`;
 }
 
 // ICS download
@@ -1231,6 +1252,7 @@ document.getElementById('groupSel').addEventListener('change', e => { groupFilte
 // ═══════════════════════════════════════════════════════
 renderMatches();
 setupOfficialCalendarCTA();
+setupTrophyImage();
 lucide.createIcons();
 </script>
 </body>
