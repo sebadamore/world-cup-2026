@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FIFA World Cup 2026 — Match Scheduler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300..700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+/* ── TOKENS ───────────────────────────────────────────── */
+:root,[data-theme="light"]{
+  --bg:#f5f3ee;--surface:#f8f7f3;--surface2:#fafaf7;--surface3:#edeae4;
+  --dyn:#e2dfd8;--div:#d9d6cf;--border:#ccc9c1;
+  --tx:#18150d;--tx2:#6a6860;--tx3:#b4b2ac;--txi:#f8f7f3;
+  --pr:#c8102e;--prh:#a50c24;--pra:#80091b;--prhl:color-mix(in oklch,#c8102e 12%,#f8f7f3);
+  --gold:#d4a017;--goldhl:color-mix(in oklch,#d4a017 12%,#f8f7f3);
+  --ok:#2e7d32;--okhl:color-mix(in oklch,#2e7d32 12%,#f8f7f3);
+  --blue:#1a73e8;--bluehl:color-mix(in oklch,#1a73e8 12%,#f8f7f3);
+  --sh1:0 1px 3px oklch(0.15 0.02 30/.07);
+  --sh2:0 4px 16px oklch(0.15 0.02 30/.10);
+  --sh3:0 16px 40px oklch(0.15 0.02 30/.14);
+  --r1:6px;--r2:10px;--r3:16px;--r4:20px;--rf:9999px;
+  --ease:160ms cubic-bezier(.16,1,.3,1);
+  --fd:'Bebas Neue',Impact,sans-serif;
+  --fb:'Inter',system-ui,sans-serif;
+  --xs:clamp(.75rem,.7rem + .25vw,.875rem);
+  --sm:clamp(.875rem,.8rem + .35vw,1rem);
+  --base:clamp(1rem,.95rem + .25vw,1.125rem);
+  --lg:clamp(1.125rem,1rem + .75vw,1.5rem);
+  --xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+  --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;--s6:1.5rem;
+  --s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;
+}
+[data-theme="dark"]{
+  --bg:#0d0c0a;--surface:#141210;--surface2:#1a1816;--surface3:#161412;
+  --dyn:#222018;--div:#272420;--border:#323028;
+  --tx:#e5e3dd;--tx2:#78766f;--tx3:#4e4c48;--txi:#0d0c0a;
+  --pr:#e8324a;--prh:#f04060;--pra:#c82840;--prhl:color-mix(in oklch,#e8324a 15%,#141210);
+  --gold:#e8b820;--goldhl:color-mix(in oklch,#e8b820 12%,#141210);
+  --ok:#4caf50;--okhl:color-mix(in oklch,#4caf50 12%,#141210);
+  --blue:#5a9ef5;--bluehl:color-mix(in oklch,#5a9ef5 12%,#141210);
+  --sh1:0 1px 3px oklch(0 0 0/.3);
+  --sh2:0 4px 16px oklch(0 0 0/.45);
+  --sh3:0 16px 40px oklch(0 0 0/.6);
+}
+
+/* ── BASE ─────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{min-height:100dvh;font-family:var(--fb);font-size:var(--base);color:var(--tx);background:var(--bg);line-height:1.55}
+img,svg{display:block;max-width:100%}
+button,input,select{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+h1,h2,h3{text-wrap:balance;line-height:1.1}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::selection{background:var(--prhl);color:var(--tx)}
+:focus-visible{outline:2px solid var(--pr);outline-offset:3px;border-radius:var(--r1)}
+a,button,[role="button"],input,select{transition:color var(--ease),background var(--ease),border-color var(--ease),box-shadow var(--ease),opacity var(--ease),transform var(--ease)}
+
+/* ── TOPBAR ────────────────────────────────────────────── */
+.topbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--div);padding:var(--s3) var(--s6);display:flex;align-items:center;gap:var(--s4);box-shadow:var(--sh1)}
+.logo{display:flex;align-items:center;gap:var(--s3);text-decoration:none;color:inherit;flex-shrink:0}
+.logo svg{flex-shrink:0}
+.logo-words{line-height:1}
+.logo-main{font-family:var(--fd);font-size:1.55rem;letter-spacing:.04em;display:block}
+.logo-sub{font-size:var(--xs);color:var(--pr);font-weight:700;letter-spacing:.12em;text-transform:uppercase;display:block;margin-top:1px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:var(--s3)}
+.theme-btn{color:var(--tx2);padding:var(--s2);border-radius:var(--r2);width:34px;height:34px;display:flex;align-items:center;justify-content:center}
+.theme-btn:hover{color:var(--tx);background:var(--dyn)}
+
+/* ── HERO ──────────────────────────────────────────────── */
+.hero{background:linear-gradient(135deg,color-mix(in oklch,var(--pr) 10%,var(--bg)) 0%,var(--bg) 55%,color-mix(in oklch,var(--gold) 6%,var(--bg)) 100%);padding:var(--s10) var(--s6) var(--s8);border-bottom:1px solid var(--div)}
+.hero-inner{max-width:1240px;margin:0 auto;display:flex;gap:var(--s8);align-items:center;flex-wrap:wrap}
+.hero h1{font-family:var(--fd);font-size:clamp(2.8rem,1rem + 5.5vw,6rem);letter-spacing:.05em;line-height:1}
+.hero-sub{color:var(--tx2);font-size:var(--sm);margin-top:var(--s2);max-width:52ch}
+.hero-kpis{display:flex;gap:var(--s6);flex-wrap:wrap;margin-top:var(--s5)}
+.kpi-num{font-family:var(--fd);font-size:clamp(2rem,.5rem + 3vw,3rem);color:var(--pr);line-height:1}
+.kpi-lbl{font-size:var(--xs);color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.trophy{font-size:clamp(4rem,2rem + 5vw,7rem);margin-left:auto;filter:drop-shadow(0 6px 24px color-mix(in oklch,var(--gold) 35%,transparent))}
+
+/* ── AUTH BANNER ────────────────────────────────────────── */
+.auth-banner{background:var(--surface);border-bottom:1px solid var(--div);padding:var(--s3) var(--s6)}
+.auth-banner-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap}
+.auth-steps{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;flex:1}
+.step{display:flex;align-items:center;gap:var(--s2);font-size:var(--xs)}
+.step-num{width:22px;height:22px;border-radius:var(--rf);font-weight:700;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid var(--border);color:var(--tx2)}
+.step.done .step-num{background:var(--ok);border-color:var(--ok);color:white}
+.step.active .step-num{background:var(--pr);border-color:var(--pr);color:white}
+.step-label{color:var(--tx2)}
+.step.done .step-label{color:var(--ok)}
+.step.active .step-label{color:var(--tx);font-weight:600}
+.step-divider{width:24px;height:1px;background:var(--border);flex-shrink:0}
+.auth-info{font-size:var(--xs);color:var(--tx2);background:var(--surface2);padding:var(--s2) var(--s3);border-radius:var(--r2);border:1px solid var(--border)}
+.auth-info code{font-size:10px;background:var(--dyn);padding:1px 5px;border-radius:3px;font-family:monospace}
+
+/* ── MAIN ──────────────────────────────────────────────── */
+.main{max-width:1240px;margin:0 auto;padding:var(--s6);width:100%}
+
+/* ── API SETUP CARD ─────────────────────────────────────── */
+.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:var(--s6);margin-bottom:var(--s6);box-shadow:var(--sh1)}
+.setup-card h2{font-family:var(--fd);font-size:var(--xl);letter-spacing:.04em;margin-bottom:var(--s4)}
+.setup-steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:var(--s4);margin-bottom:var(--s5)}
+.setup-step{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:var(--s4)}
+.setup-step-head{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s3)}
+.setup-step-n{font-family:var(--fd);font-size:1.6rem;color:var(--pr);line-height:1;flex-shrink:0}
+.setup-step-title{font-size:var(--sm);font-weight:700;color:var(--tx)}
+.setup-step p{font-size:var(--xs);color:var(--tx2);line-height:1.7}
+.setup-step a{color:var(--blue);text-decoration:none}
+.setup-step a:hover{text-decoration:underline}
+.setup-step code{font-size:10px;background:var(--dyn);padding:1px 5px;border-radius:3px;font-family:monospace;color:var(--tx)}
+.creds-form{display:grid;grid-template-columns:1fr 1fr auto;gap:var(--s3);align-items:end}
+.creds-form label{font-size:var(--xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx2);display:block;margin-bottom:var(--s2)}
+.creds-input{width:100%;padding:var(--s3);background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);font-size:var(--xs);color:var(--tx);font-family:monospace}
+.creds-input:focus{outline:none;border-color:var(--pr);box-shadow:0 0 0 3px var(--prhl)}
+.creds-input.valid{border-color:var(--ok)}
+
+/* ── CONTROLS BAR ───────────────────────────────────────── */
+.controls{display:flex;gap:var(--s3);flex-wrap:wrap;align-items:center;margin-bottom:var(--s6);padding:var(--s4);background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);box-shadow:var(--sh1)}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-icon{position:absolute;left:var(--s3);top:50%;transform:translateY(-50%);color:var(--tx3);pointer-events:none}
+.search-input{width:100%;padding:var(--s2) var(--s4) var(--s2) calc(var(--s4) + 20px);background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);font-size:var(--sm);color:var(--tx)}
+.search-input:focus{outline:none;border-color:var(--pr);box-shadow:0 0 0 3px var(--prhl)}
+.search-input::placeholder{color:var(--tx3)}
+.pills{display:flex;gap:var(--s2);flex-wrap:wrap}
+.pill{padding:var(--s2) var(--s3);border-radius:var(--r2);font-size:var(--xs);font-weight:700;color:var(--tx2);border:1.5px solid var(--border);background:var(--surface2);text-transform:uppercase;letter-spacing:.06em}
+.pill:hover{border-color:var(--pr);color:var(--pr)}
+.pill.on{background:var(--pr);color:white;border-color:var(--pr)}
+.select{padding:var(--s2) var(--s3);background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);font-size:var(--xs);font-weight:700;color:var(--tx);text-transform:uppercase;letter-spacing:.04em;cursor:pointer}
+.select:focus{outline:none;border-color:var(--pr)}
+
+/* ── STATS ROW ──────────────────────────────────────────── */
+.stats-row{display:flex;gap:var(--s5);flex-wrap:wrap;padding:var(--s4) var(--s5);background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);margin-bottom:var(--s6);box-shadow:var(--sh1)}
+.stat{display:flex;align-items:center;gap:var(--s2)}
+.stat-n{font-family:var(--fd);font-size:var(--lg);color:var(--pr);line-height:1}
+.stat-l{font-size:var(--xs);color:var(--tx2);text-transform:uppercase;letter-spacing:.08em}
+.stat-sep{margin-left:auto;font-size:var(--xs);color:var(--tx3)}
+
+/* ── SECTION HEADERS ────────────────────────────────────── */
+.sec-head{display:flex;align-items:center;gap:var(--s4);padding:var(--s5) 0 var(--s3);border-bottom:2px solid var(--div);margin-bottom:var(--s4)}
+.sec-title{font-family:var(--fd);font-size:var(--xl);letter-spacing:.05em}
+.sec-sub{font-size:var(--xs);color:var(--tx2);text-transform:uppercase;letter-spacing:.1em}
+.sec-icon{font-size:1.5rem}
+.grp-head{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s3)}
+.grp-badge{font-family:var(--fd);font-size:var(--xl);letter-spacing:.04em}
+.grp-lbl{font-size:var(--xs);color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.grp-line{flex:1;height:1px;background:var(--div)}
+.grp-sec{margin-bottom:var(--s8)}
+
+/* ── MATCH CARDS ────────────────────────────────────────── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(360px,100%),1fr));gap:var(--s4)}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r3);padding:var(--s4) var(--s5);display:flex;flex-direction:column;gap:var(--s3);box-shadow:var(--sh1);position:relative;overflow:hidden}
+.card:hover{transform:translateY(-2px);box-shadow:var(--sh2);border-color:color-mix(in oklch,var(--pr) 28%,var(--border))}
+.card.saved{border-color:var(--ok);background:color-mix(in oklch,var(--ok) 4%,var(--surface))}
+.card.saved::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ok);border-radius:var(--r3) var(--r3) 0 0}
+.card.adding::after{content:'Adding…';position:absolute;inset:0;background:color-mix(in oklch,var(--bg) 85%,transparent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--sm);color:var(--blue);border-radius:var(--r3)}
+.card-meta{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap}
+.badge{font-size:var(--xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:2px var(--s2);border-radius:var(--rf);background:var(--prhl);color:var(--pr)}
+.badge.ko{background:var(--goldhl);color:var(--gold)}
+.badge.fin{background:var(--goldhl);color:var(--gold);font-size:var(--sm)}
+.card-date{font-size:var(--xs);color:var(--tx2);margin-left:auto;font-weight:500}
+.teams{display:flex;align-items:center;gap:var(--s3)}
+.team{display:flex;align-items:center;gap:var(--s2);flex:1}
+.team.away{flex-direction:row-reverse;text-align:right}
+.flag{font-size:1.5rem;line-height:1;flex-shrink:0}
+.tname{font-weight:600;font-size:var(--sm);color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:105px}
+.vs{font-family:var(--fd);font-size:1.15rem;color:var(--tx3);letter-spacing:.1em;flex-shrink:0}
+.venue{font-size:var(--xs);color:var(--tx2);display:flex;align-items:center;gap:var(--s1)}
+.actions{display:flex;gap:var(--s2);flex-wrap:wrap}
+
+/* ── BUTTONS ────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s3);border-radius:var(--r2);font-size:var(--xs);font-weight:600;border:1.5px solid transparent;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn-pr{background:var(--pr);color:white;border-color:var(--pr)}
+.btn-pr:hover{background:var(--prh);border-color:var(--prh)}
+.btn-out{background:transparent;color:var(--tx2);border-color:var(--border)}
+.btn-out:hover{border-color:var(--pr);color:var(--pr);background:var(--prhl)}
+.btn-ok{background:var(--ok);color:white;border-color:var(--ok)}
+.btn-gcal{background:#1a73e8;color:white;border-color:#1a73e8}
+.btn-gcal:hover{background:#1557b0;border-color:#1557b0}
+.btn-gcal:disabled{background:var(--border);border-color:var(--border);color:var(--tx3);cursor:not-allowed;opacity:.6}
+.btn-ics{background:var(--surface2);color:var(--tx2);border-color:var(--border)}
+.btn-ics:hover{border-color:var(--ok);color:var(--ok)}
+.btn-icon{width:32px;height:32px;padding:0;justify-content:center}
+.btn-sm{padding:calc(var(--s2)*.8) var(--s2);font-size:calc(var(--xs)*.9)}
+
+/* ── GCAL STATUS ─────────────────────────────────────────── */
+.gcal-status{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s4);background:var(--surface2);border:1px solid var(--border);border-radius:var(--rf);font-size:var(--xs);font-weight:600}
+.gcal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.gcal-dot.red{background:#ff4444}
+.gcal-dot.yellow{background:var(--gold)}
+.gcal-dot.green{background:var(--ok)}
+
+/* ── SIDE PANEL ─────────────────────────────────────────── */
+.panel{position:fixed;right:0;top:0;height:100dvh;width:400px;max-width:calc(100vw - var(--s8));background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--sh3);z-index:200;display:flex;flex-direction:column;transform:translateX(102%);transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.panel.open{transform:translateX(0)}
+.panel-head{padding:var(--s5) var(--s5) var(--s4);border-bottom:1px solid var(--div);display:flex;align-items:center;gap:var(--s3)}
+.panel-title{font-family:var(--fd);font-size:1.5rem;letter-spacing:.04em;flex:1}
+.panel-count{background:var(--pr);color:white;border-radius:var(--rf);font-size:var(--xs);font-weight:700;padding:2px var(--s2);min-width:22px;text-align:center}
+.panel-body{flex:1;overflow-y:auto;padding:var(--s4)}
+.panel-foot{padding:var(--s4) var(--s5);border-top:1px solid var(--div);display:flex;flex-direction:column;gap:var(--s3)}
+.saved-item{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3);background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:var(--s3)}
+.saved-info{flex:1;min-width:0}
+.saved-title{font-size:var(--sm);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saved-meta{font-size:var(--xs);color:var(--tx2);margin-top:2px}
+.saved-added{font-size:var(--xs);color:var(--ok);font-weight:600;margin-top:2px}
+.empty-state{text-align:center;padding:var(--s16) var(--s8);color:var(--tx3)}
+.empty-icon{font-size:3rem;margin-bottom:var(--s4)}
+.overlay{position:fixed;inset:0;background:oklch(0 0 0/.4);z-index:199;opacity:0;pointer-events:none;transition:opacity var(--ease)}
+.overlay.on{opacity:1;pointer-events:all}
+
+/* ── MODAL ────────────────────────────────────────────────── */
+.modal-bg{position:fixed;inset:0;background:oklch(0 0 0/.6);z-index:300;display:flex;align-items:center;justify-content:center;padding:var(--s4);opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-bg.on{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r4);padding:var(--s6);max-width:500px;width:100%;box-shadow:var(--sh3);transform:scale(.96);transition:transform .2s cubic-bezier(.16,1,.3,1)}
+.modal-bg.on .modal{transform:scale(1)}
+.modal h2{font-family:var(--fd);font-size:1.7rem;letter-spacing:.04em;margin-bottom:var(--s4)}
+.modal-match{background:var(--surface2);border-radius:var(--r2);padding:var(--s4);margin-bottom:var(--s4);border:1px solid var(--border);text-align:center}
+.modal-teams{font-size:var(--lg);font-weight:700;margin-bottom:var(--s2)}
+.modal-meta{font-size:var(--xs);color:var(--tx2)}
+.opt{display:flex;align-items:center;gap:var(--s3);padding:var(--s3);background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);margin-bottom:var(--s3);cursor:pointer}
+.opt:hover{border-color:var(--pr)}
+.opt-ico{width:38px;height:38px;border-radius:var(--r2);background:#1a73e8;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.2rem}
+.opt-body{flex:1}
+.opt-title{font-size:var(--sm);font-weight:600}
+.opt-desc{font-size:var(--xs);color:var(--tx2)}
+
+/* ── LOG PANEL ────────────────────────────────────────────── */
+.log-section{margin-top:var(--s8)}
+.log-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden}
+.log-head{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-bottom:1px solid var(--div);background:var(--surface2)}
+.log-title{font-size:var(--xs);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx2)}
+.log-body{padding:var(--s3) var(--s4);font-family:monospace;font-size:var(--xs);color:var(--tx2);max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+.log-entry{display:flex;gap:var(--s3);align-items:flex-start}
+.log-time{color:var(--tx3);flex-shrink:0}
+.log-msg{flex:1}
+.log-ok{color:var(--ok)}
+.log-err{color:var(--pr)}
+.log-info{color:var(--blue)}
+.log-warn{color:var(--gold)}
+
+/* ── TOAST ────────────────────────────────────────────────── */
+.toasts{position:fixed;bottom:var(--s6);left:50%;transform:translateX(-50%);z-index:400;display:flex;flex-direction:column;gap:var(--s2);align-items:center;pointer-events:none}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--rf);padding:var(--s3) var(--s5);font-size:var(--sm);font-weight:600;box-shadow:var(--sh3);display:flex;align-items:center;gap:var(--s2);animation:tin .3s cubic-bezier(.16,1,.3,1) forwards;pointer-events:all}
+.toast.ok{border-color:var(--ok);background:var(--okhl);color:var(--ok)}
+.toast.err{border-color:var(--pr);background:var(--prhl);color:var(--pr)}
+.toast.info{border-color:var(--blue);background:var(--bluehl);color:var(--blue)}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BADGE ON BTN ─────────────────────────────────────────── */
+.rel{position:relative}
+.badge-dot{position:absolute;top:-4px;right:-4px;background:var(--pr);color:white;border-radius:var(--rf);font-size:10px;font-weight:700;padding:1px 5px;min-width:18px;text-align:center;border:2px solid var(--bg);display:none}
+.badge-dot.on{display:block}
+
+/* ── RESPONSIVE ───────────────────────────────────────────── */
+@media(max-width:768px){
+  .topbar{padding:var(--s3) var(--s4)}
+  .hero{padding:var(--s8) var(--s4) var(--s6)}
+  .trophy{display:none}
+  .main{padding:var(--s4)}
+  .panel{width:100vw;max-width:100vw}
+  .creds-form{grid-template-columns:1fr}
+  .tname{max-width:75px}
+  .setup-steps{grid-template-columns:1fr}
+  .auth-banner{padding:var(--s3) var(--s4)}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ──────────────────────────────────────────── -->
+<header class="topbar">
+  <a href="#" class="logo">
+    <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+      <circle cx="17" cy="17" r="16" fill="var(--pr)"/>
+      <circle cx="17" cy="17" r="10" stroke="white" stroke-width="1.5" fill="none"/>
+      <circle cx="17" cy="17" r="2.5" fill="white"/>
+      <path d="M17 7L19.5 13L17 10.5L14.5 13Z" fill="white"/>
+      <path d="M17 27L19.5 21L17 23.5L14.5 21Z" fill="white"/>
+      <path d="M7 17L13 14.5L10.5 17L13 19.5Z" fill="white"/>
+      <path d="M27 17L21 14.5L23.5 17L21 19.5Z" fill="white"/>
+    </svg>
+    <div class="logo-words">
+      <span class="logo-main">World Cup 2026</span>
+      <span class="logo-sub">Match Scheduler</span>
+    </div>
+  </a>
+  <div class="topbar-right">
+    <div class="gcal-status" id="gcalStatus">
+      <div class="gcal-dot red" id="gcalDot"></div>
+      <span id="gcalStatusText">Not connected</span>
+    </div>
+    <button class="btn btn-out btn-sm rel" id="panelBtn" aria-label="Saved matches">
+      <i data-lucide="calendar-check" style="width:14px;height:14px"></i>
+      Saved
+      <span class="badge-dot" id="badgeDot">0</span>
+    </button>
+    <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ── AUTH PROGRESS BANNER ────────────────────────────── -->
+<div class="auth-banner">
+  <div class="auth-banner-inner">
+    <div class="auth-steps" id="authSteps">
+      <div class="step" id="step1"><span class="step-num">1</span><span class="step-label">Enter credentials</span></div>
+      <div class="step-divider"></div>
+      <div class="step" id="step2"><span class="step-num">2</span><span class="step-label">Load API</span></div>
+      <div class="step-divider"></div>
+      <div class="step" id="step3"><span class="step-num">3</span><span class="step-label">Authorize Google</span></div>
+      <div class="step-divider"></div>
+      <div class="step" id="step4"><span class="step-num">4</span><span class="step-label">Create events</span></div>
+    </div>
+    <div class="auth-info">Scope: <code>calendar</code> · Times in <code>America/New_York</code></div>
+  </div>
+</div>
+
+<!-- ── HERO ────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <h1>FIFA World Cup<br>2026 Fixtures</h1>
+      <p class="hero-sub">All 104 official matches across USA, Canada &amp; Mexico. Connect Google Calendar to add any match directly to your calendar with one click.</p>
+      <div class="hero-kpis">
+        <div><div class="kpi-num">104</div><div class="kpi-lbl">Matches</div></div>
+        <div><div class="kpi-num">48</div><div class="kpi-lbl">Teams</div></div>
+        <div><div class="kpi-num">16</div><div class="kpi-lbl">Venues</div></div>
+        <div><div class="kpi-num" id="daysKpi">—</div><div class="kpi-lbl">Days to go</div></div>
+      </div>
+    </div>
+    <div class="trophy" aria-hidden="true">🏆</div>
+  </div>
+</section>
+
+<!-- ── MAIN ─────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- API SETUP CARD -->
+  <div class="setup-card" id="setupCard">
+    <h2>🔗 Connect Google Calendar API</h2>
+    <div class="setup-steps">
+      <div class="setup-step">
+        <div class="setup-step-head"><div class="setup-step-n">1</div><div class="setup-step-title">Create a Google Cloud Project</div></div>
+        <p>Go to <a href="https://console.cloud.google.com" target="_blank" rel="noopener">console.cloud.google.com</a> → New Project. Enable the <a href="https://console.cloud.google.com/apis/library/calendar-json.googleapis.com" target="_blank" rel="noopener">Google Calendar API</a> for your project.</p>
+      </div>
+      <div class="setup-step">
+        <div class="setup-step-head"><div class="setup-step-n">2</div><div class="setup-step-title">Create OAuth2 Client ID</div></div>
+        <p>APIs &amp; Services → Credentials → Create Credentials → <code>OAuth Client ID</code>. App type: <code>Web application</code>. Add <code>http://localhost:8080</code> or your domain to Authorized JavaScript Origins.</p>
+      </div>
+      <div class="setup-step">
+        <div class="setup-step-head"><div class="setup-step-n">3</div><div class="setup-step-title">Create an API Key</div></div>
+        <p>Credentials → Create Credentials → <code>API Key</code>. Optionally restrict it to the Calendar API. Copy both the Client ID and the API Key below.</p>
+      </div>
+      <div class="setup-step">
+        <div class="setup-step-head"><div class="setup-step-n">4</div><div class="setup-step-title">Configure OAuth Consent Screen</div></div>
+        <p>Google Auth Platform → Branding. Set User Type to <code>External</code> if sharing with others. Add scope <code>https://www.googleapis.com/auth/calendar</code> under Data Access.</p>
+      </div>
+    </div>
+    <div class="creds-form">
+      <div>
+        <label for="clientId">OAuth 2.0 Client ID</label>
+        <input id="clientId" class="creds-input" type="text" placeholder="xxxx.apps.googleusercontent.com" spellcheck="false" autocomplete="off"/>
+      </div>
+      <div>
+        <label for="apiKey">API Key</label>
+        <input id="apiKey" class="creds-input" type="text" placeholder="AIzaSy…" spellcheck="false" autocomplete="off"/>
+      </div>
+      <div style="padding-bottom:1px">
+        <button class="btn btn-pr" id="loadApiBtn" style="height:42px">
+          <i data-lucide="plug" style="width:14px;height:14px"></i>
+          Load &amp; Authorize
+        </button>
+      </div>
+    </div>
+    <p style="font-size:var(--xs);color:var(--tx2);margin-top:var(--s3)">Credentials are used only in your browser and never sent anywhere. This app uses the <a href="https://developers.google.com/workspace/calendar/api/quickstart/js" target="_blank" rel="noopener" style="color:var(--blue)">official Google Calendar JS quickstart</a> pattern with <strong>GAPI + Google Identity Services (GIS)</strong>.</p>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat"><span class="stat-n" id="statShow">104</span><span class="stat-l">showing</span></div>
+    <div class="stat"><span class="stat-n" id="statSaved">0</span><span class="stat-l">saved</span></div>
+    <div class="stat"><span class="stat-n" id="statAdded">0</span><span class="stat-l">added to calendar</span></div>
+    <div class="stat-sep">All times Eastern (ET)</div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="search-wrap">
+      <i data-lucide="search" class="search-icon" style="width:15px;height:15px"></i>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search team, venue, city…" aria-label="Search matches">
+    </div>
+    <div class="pills" id="stagePills">
+      <button class="pill on" data-s="all">All</button>
+      <button class="pill" data-s="Group Stage">Groups</button>
+      <button class="pill" data-s="knockout">Knockout</button>
+      <button class="pill" data-s="saved">Saved</button>
+    </div>
+    <select class="select" id="groupSel" aria-label="Filter by group">
+      <option value="all">All Groups</option>
+      <option value="A">Group A</option><option value="B">Group B</option>
+      <option value="C">Group C</option><option value="D">Group D</option>
+      <option value="E">Group E</option><option value="F">Group F</option>
+      <option value="G">Group G</option><option value="H">Group H</option>
+      <option value="I">Group I</option><option value="J">Group J</option>
+      <option value="K">Group K</option><option value="L">Group L</option>
+    </select>
+  </div>
+
+  <!-- MATCHES -->
+  <div id="matchesOut"></div>
+
+  <!-- LOG -->
+  <div class="log-section">
+    <div class="log-box">
+      <div class="log-head">
+        <i data-lucide="terminal" style="width:14px;height:14px;color:var(--tx3)"></i>
+        <span class="log-title">Google Calendar API Log</span>
+        <button class="btn btn-out btn-sm" id="clearLog" style="margin-left:auto;padding:2px 8px;font-size:10px">Clear</button>
+      </div>
+      <div class="log-body" id="logBody">
+        <div class="log-entry"><span class="log-time">--:--:--</span><span class="log-msg log-info">→ Enter your Client ID &amp; API Key above, then click "Load &amp; Authorize"</span></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── OVERLAY ───────────────────────────────────────────── -->
+<div class="overlay" id="overlay"></div>
+
+<!-- ── SIDE PANEL ──────────────────────────────────────────── -->
+<aside class="panel" id="panel" aria-label="Saved matches">
+  <div class="panel-head">
+    <div class="panel-title">Saved Matches</div>
+    <span class="panel-count" id="panelCount">0</span>
+    <button class="btn btn-out btn-sm btn-icon" id="closePanel" aria-label="Close">
+      <i data-lucide="x" style="width:15px;height:15px"></i>
+    </button>
+  </div>
+  <div class="panel-body" id="panelBody">
+    <div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <p style="color:var(--tx2);font-size:var(--sm)">No matches saved yet.<br>Click the save button on any match.</p>
+    </div>
+  </div>
+  <div class="panel-foot">
+    <button class="btn btn-gcal" id="addAllGcal" style="justify-content:center">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Add All Saved → Google Calendar
+    </button>
+    <button class="btn btn-ics" id="exportIcsAll" style="justify-content:center">
+      <i data-lucide="download" style="width:14px;height:14px"></i>
+      Download .ics (all saved)
+    </button>
+    <button class="btn btn-out" id="clearSaved" style="justify-content:center;color:var(--tx3)">
+      <i data-lucide="trash-2" style="width:14px;height:14px"></i>
+      Clear all
+    </button>
+  </div>
+</aside>
+
+<!-- ── MODAL ─────────────────────────────────────────────── -->
+<div class="modal-bg" id="modalBg" role="dialog" aria-modal="true">
+  <div class="modal">
+    <h2>Add to Calendar</h2>
+    <div class="modal-match" id="modalInfo"></div>
+    <div class="opt" id="optGcal">
+      <div class="opt-ico">📅</div>
+      <div class="opt-body">
+        <div class="opt-title">Add via Google Calendar API</div>
+        <div class="opt-desc">Directly inserts event using your authenticated session</div>
+      </div>
+      <i data-lucide="zap" style="width:15px;height:15px;color:var(--blue)"></i>
+    </div>
+    <div class="opt" id="optLink">
+      <div class="opt-ico" style="background:#34a853">🔗</div>
+      <div class="opt-body">
+        <div class="opt-title">Open Google Calendar (browser link)</div>
+        <div class="opt-desc">Opens pre-filled event in a new tab — no API required</div>
+      </div>
+      <i data-lucide="external-link" style="width:15px;height:15px;color:var(--tx3)"></i>
+    </div>
+    <div class="opt" id="optIcs">
+      <div class="opt-ico" style="background:#ea4335">📁</div>
+      <div class="opt-body">
+        <div class="opt-title">Download .ics file</div>
+        <div class="opt-desc">Import into Apple Calendar, Outlook, or any app</div>
+      </div>
+      <i data-lucide="download" style="width:15px;height:15px;color:var(--tx3)"></i>
+    </div>
+    <div style="display:flex;justify-content:flex-end">
+      <button class="btn btn-out" id="closeModal">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOASTS ────────────────────────────────────────────── -->
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// MATCH DATA — all 104 official 2026 FIFA World Cup fixtures
+// ═══════════════════════════════════════════════════════
+const MATCHES = [
+  // ── GROUP A ───────────────────────────────────────────────────────────────────
+  {id:1,g:"A",d:"2026-06-11",t:"15:00",h:"Mexico",a:"South Africa",v:"Estadio Azteca",c:"Mexico City, MEX",s:"Group Stage",fh:"🇲🇽",fa:"🇿🇦"},
+  {id:2,g:"A",d:"2026-06-11",t:"22:00",h:"South Korea",a:"Czechia",v:"Estadio Akron",c:"Guadalajara, MEX",s:"Group Stage",fh:"🇰🇷",fa:"🇨🇿"},
+  {id:3,g:"A",d:"2026-06-18",t:"12:00",h:"Czechia",a:"South Africa",v:"Mercedes-Benz Stadium",c:"Atlanta, GA",s:"Group Stage",fh:"🇨🇿",fa:"🇿🇦"},
+  {id:4,g:"A",d:"2026-06-18",t:"21:00",h:"Mexico",a:"South Korea",v:"Estadio Akron",c:"Guadalajara, MEX",s:"Group Stage",fh:"🇲🇽",fa:"🇰🇷"},
+  {id:5,g:"A",d:"2026-06-24",t:"21:00",h:"Czechia",a:"Mexico",v:"Estadio Azteca",c:"Mexico City, MEX",s:"Group Stage",fh:"🇨🇿",fa:"🇲🇽"},
+  {id:6,g:"A",d:"2026-06-24",t:"21:00",h:"South Africa",a:"South Korea",v:"Estadio BBVA",c:"Monterrey, MEX",s:"Group Stage",fh:"🇿🇦",fa:"🇰🇷"},
+  // ── GROUP B ───────────────────────────────────────────────────────────────────
+  {id:7,g:"B",d:"2026-06-12",t:"15:00",h:"Canada",a:"Bosnia-Herzegovina",v:"BMO Field",c:"Toronto, CAN",s:"Group Stage",fh:"🇨🇦",fa:"🇧🇦"},
+  {id:8,g:"B",d:"2026-06-13",t:"15:00",h:"Qatar",a:"Switzerland",v:"Levi's Stadium",c:"Santa Clara, CA",s:"Group Stage",fh:"🇶🇦",fa:"🇨🇭"},
+  {id:9,g:"B",d:"2026-06-18",t:"15:00",h:"Bosnia-Herzegovina",a:"Switzerland",v:"SoFi Stadium",c:"Inglewood, CA",s:"Group Stage",fh:"🇧🇦",fa:"🇨🇭"},
+  {id:10,g:"B",d:"2026-06-18",t:"18:00",h:"Canada",a:"Qatar",v:"BC Place",c:"Vancouver, CAN",s:"Group Stage",fh:"🇨🇦",fa:"🇶🇦"},
+  {id:11,g:"B",d:"2026-06-24",t:"15:00",h:"Switzerland",a:"Canada",v:"BC Place",c:"Vancouver, CAN",s:"Group Stage",fh:"🇨🇭",fa:"🇨🇦"},
+  {id:12,g:"B",d:"2026-06-24",t:"15:00",h:"Bosnia-Herzegovina",a:"Qatar",v:"Lumen Field",c:"Seattle, WA",s:"Group Stage",fh:"🇧🇦",fa:"🇶🇦"},
+  // ── GROUP C ───────────────────────────────────────────────────────────────────
+  {id:13,g:"C",d:"2026-06-13",t:"18:00",h:"Brazil",a:"Morocco",v:"MetLife Stadium",c:"East Rutherford, NJ",s:"Group Stage",fh:"🇧🇷",fa:"🇲🇦"},
+  {id:14,g:"C",d:"2026-06-13",t:"21:00",h:"Haiti",a:"Scotland",v:"Gillette Stadium",c:"Foxborough, MA",s:"Group Stage",fh:"🇭🇹",fa:"🏴󠁧󠁢󠁳󠁣󠁴󠁿"},
+  {id:15,g:"C",d:"2026-06-19",t:"18:00",h:"Scotland",a:"Morocco",v:"Lincoln Financial Field",c:"Philadelphia, PA",s:"Group Stage",fh:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",fa:"🇲🇦"},
+  {id:16,g:"C",d:"2026-06-19",t:"21:00",h:"Brazil",a:"Haiti",v:"Gillette Stadium",c:"Foxborough, MA",s:"Group Stage",fh:"🇧🇷",fa:"🇭🇹"},
+  {id:17,g:"C",d:"2026-06-24",t:"18:00",h:"Scotland",a:"Brazil",v:"Hard Rock Stadium",c:"Miami, FL",s:"Group Stage",fh:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",fa:"🇧🇷"},
+  {id:18,g:"C",d:"2026-06-24",t:"18:00",h:"Morocco",a:"Haiti",v:"Mercedes-Benz Stadium",c:"Atlanta, GA",s:"Group Stage",fh:"🇲🇦",fa:"🇭🇹"},
+  // ── GROUP D ───────────────────────────────────────────────────────────────────
+  {id:19,g:"D",d:"2026-06-12",t:"21:00",h:"United States",a:"Paraguay",v:"SoFi Stadium",c:"Inglewood, CA",s:"Group Stage",fh:"🇺🇸",fa:"🇵🇾"},
+  {id:20,g:"D",d:"2026-06-14",t:"00:00",h:"Australia",a:"Türkiye",v:"BC Place",c:"Vancouver, CAN",s:"Group Stage",fh:"🇦🇺",fa:"🇹🇷"},
+  {id:21,g:"D",d:"2026-06-19",t:"15:00",h:"United States",a:"Australia",v:"Lumen Field",c:"Seattle, WA",s:"Group Stage",fh:"🇺🇸",fa:"🇦🇺"},
+  {id:22,g:"D",d:"2026-06-20",t:"00:00",h:"Türkiye",a:"Paraguay",v:"Levi's Stadium",c:"Santa Clara, CA",s:"Group Stage",fh:"🇹🇷",fa:"🇵🇾"},
+  {id:23,g:"D",d:"2026-06-25",t:"22:00",h:"Türkiye",a:"United States",v:"SoFi Stadium",c:"Inglewood, CA",s:"Group Stage",fh:"🇹🇷",fa:"🇺🇸"},
+  {id:24,g:"D",d:"2026-06-25",t:"22:00",h:"Paraguay",a:"Australia",v:"Levi's Stadium",c:"Santa Clara, CA",s:"Group Stage",fh:"🇵🇾",fa:"🇦🇺"},
+  // ── GROUP E ───────────────────────────────────────────────────────────────────
+  {id:25,g:"E",d:"2026-06-14",t:"13:00",h:"Germany",a:"Curaçao",v:"NRG Stadium",c:"Houston, TX",s:"Group Stage",fh:"🇩🇪",fa:"🇨🇼"},
+  {id:26,g:"E",d:"2026-06-14",t:"19:00",h:"Ivory Coast",a:"Ecuador",v:"Lincoln Financial Field",c:"Philadelphia, PA",s:"Group Stage",fh:"🇨🇮",fa:"🇪🇨"},
+  {id:27,g:"E",d:"2026-06-20",t:"16:00",h:"Germany",a:"Ivory Coast",v:"BMO Field",c:"Toronto, CAN",s:"Group Stage",fh:"🇩🇪",fa:"🇨🇮"},
+  {id:28,g:"E",d:"2026-06-20",t:"20:00",h:"Ecuador",a:"Curaçao",v:"Arrowhead Stadium",c:"Kansas City, MO",s:"Group Stage",fh:"🇪🇨",fa:"🇨🇼"},
+  {id:29,g:"E",d:"2026-06-25",t:"16:00",h:"Ecuador",a:"Germany",v:"MetLife Stadium",c:"East Rutherford, NJ",s:"Group Stage",fh:"🇪🇨",fa:"🇩🇪"},
+  {id:30,g:"E",d:"2026-06-25",t:"16:00",h:"Curaçao",a:"Ivory Coast",v:"Lincoln Financial Field",c:"Philadelphia, PA",s:"Group Stage",fh:"🇨🇼",fa:"🇨🇮"},
+  // ── GROUP F ───────────────────────────────────────────────────────────────────
+  {id:31,g:"F",d:"2026-06-14",t:"16:00",h:"Netherlands",a:"Japan",v:"AT&T Stadium",c:"Arlington, TX",s:"Group Stage",fh:"🇳🇱",fa:"🇯🇵"},
+  {id:32,g:"F",d:"2026-06-14",t:"22:00",h:"Sweden",a:"Tunisia",v:"Estadio BBVA",c:"Monterrey, MEX",s:"Group Stage",fh:"🇸🇪",fa:"🇹🇳"},
+  {id:33,g:"F",d:"2026-06-20",t:"13:00",h:"Tunisia",a:"Japan",v:"Estadio BBVA",c:"Monterrey, MEX",s:"Group Stage",fh:"🇹🇳",fa:"🇯🇵"},
+  {id:34,g:"F",d:"2026-06-20",t:"00:00",h:"Netherlands",a:"Sweden",v:"NRG Stadium",c:"Houston, TX",s:"Group Stage",fh:"🇳🇱",fa:"🇸🇪"},
+  {id:35,g:"F",d:"2026-06-25",t:"19:00",h:"Tunisia",a:"Netherlands",v:"AT&T Stadium",c:"Arlington, TX",s:"Group Stage",fh:"🇹🇳",fa:"🇳🇱"},
+  {id:36,g:"F",d:"2026-06-25",t:"19:00",h:"Japan",a:"Sweden",v:"Arrowhead Stadium",c:"Kansas City, MO",s:"Group Stage",fh:"🇯🇵",fa:"🇸🇪"},
+  // ── GROUP G ───────────────────────────────────────────────────────────────────
+  {id:37,g:"G",d:"2026-06-15",t:"15:00",h:"Belgium",a:"Egypt",v:"Lumen Field",c:"Seattle, WA",s:"Group Stage",fh:"🇧🇪",fa:"🇪🇬"},
+  {id:38,g:"G",d:"2026-06-15",t:"21:00",h:"Iran",a:"New Zealand",v:"SoFi Stadium",c:"Inglewood, CA",s:"Group Stage",fh:"🇮🇷",fa:"🇳🇿"},
+  {id:39,g:"G",d:"2026-06-21",t:"15:00",h:"Belgium",a:"Iran",v:"SoFi Stadium",c:"Inglewood, CA",s:"Group Stage",fh:"🇧🇪",fa:"🇮🇷"},
+  {id:40,g:"G",d:"2026-06-21",t:"21:00",h:"New Zealand",a:"Egypt",v:"BC Place",c:"Vancouver, CAN",s:"Group Stage",fh:"🇳🇿",fa:"🇪🇬"},
+  {id:41,g:"G",d:"2026-06-26",t:"20:00",h:"New Zealand",a:"Belgium",v:"Lumen Field",c:"Seattle, WA",s:"Group Stage",fh:"🇳🇿",fa:"🇧🇪"},
+  {id:42,g:"G",d:"2026-06-26",t:"20:00",h:"Egypt",a:"Iran",v:"BC Place",c:"Vancouver, CAN",s:"Group Stage",fh:"🇪🇬",fa:"🇮🇷"},
+  // ── GROUP H ───────────────────────────────────────────────────────────────────
+  {id:43,g:"H",d:"2026-06-15",t:"12:00",h:"Spain",a:"Cape Verde",v:"Mercedes-Benz Stadium",c:"Atlanta, GA",s:"Group Stage",fh:"🇪🇸",fa:"🇨🇻"},
+  {id:44,g:"H",d:"2026-06-15",t:"18:00",h:"Saudi Arabia",a:"Uruguay",v:"Hard Rock Stadium",c:"Miami, FL",s:"Group Stage",fh:"🇸🇦",fa:"🇺🇾"},
+  {id:45,g:"H",d:"2026-06-21",t:"12:00",h:"Spain",a:"Saudi Arabia",v:"Mercedes-Benz Stadium",c:"Atlanta, GA",s:"Group Stage",fh:"🇪🇸",fa:"🇸🇦"},
+  {id:46,g:"H",d:"2026-06-21",t:"18:00",h:"Uruguay",a:"Cape Verde",v:"Hard Rock Stadium",c:"Miami, FL",s:"Group Stage",fh:"🇺🇾",fa:"🇨🇻"},
+  {id:47,g:"H",d:"2026-06-26",t:"20:00",h:"Uruguay",a:"Spain",v:"NRG Stadium",c:"Houston, TX",s:"Group Stage",fh:"🇺🇾",fa:"🇪🇸"},
+  {id:48,g:"H",d:"2026-06-26",t:"20:00",h:"Cape Verde",a:"Saudi Arabia",v:"Estadio Akron",c:"Guadalajara, MEX",s:"Group Stage",fh:"🇨🇻",fa:"🇸🇦"},
+  // ── GROUP I ───────────────────────────────────────────────────────────────────
+  {id:49,g:"I",d:"2026-06-16",t:"15:00",h:"France",a:"Senegal",v:"MetLife Stadium",c:"East Rutherford, NJ",s:"Group Stage",fh:"🇫🇷",fa:"🇸🇳"},
+  {id:50,g:"I",d:"2026-06-16",t:"18:00",h:"Iraq",a:"Norway",v:"Gillette Stadium",c:"Foxborough, MA",s:"Group Stage",fh:"🇮🇶",fa:"🇳🇴"},
+  {id:51,g:"I",d:"2026-06-22",t:"17:00",h:"France",a:"Iraq",v:"Lincoln Financial Field",c:"Philadelphia, PA",s:"Group Stage",fh:"🇫🇷",fa:"🇮🇶"},
+  {id:52,g:"I",d:"2026-06-22",t:"20:00",h:"Norway",a:"Senegal",v:"MetLife Stadium",c:"East Rutherford, NJ",s:"Group Stage",fh:"🇳🇴",fa:"🇸🇳"},
+  {id:53,g:"I",d:"2026-06-26",t:"15:00",h:"Norway",a:"France",v:"Gillette Stadium",c:"Foxborough, MA",s:"Group Stage",fh:"🇳🇴",fa:"🇫🇷"},
+  {id:54,g:"I",d:"2026-06-26",t:"15:00",h:"Senegal",a:"Iraq",v:"BMO Field",c:"Toronto, CAN",s:"Group Stage",fh:"🇸🇳",fa:"🇮🇶"},
+  // ── GROUP J ───────────────────────────────────────────────────────────────────
+  {id:55,g:"J",d:"2026-06-16",t:"21:00",h:"Argentina",a:"Algeria",v:"Arrowhead Stadium",c:"Kansas City, MO",s:"Group Stage",fh:"🇦🇷",fa:"🇩🇿"},
+  {id:56,g:"J",d:"2026-06-17",t:"00:00",h:"Austria",a:"Jordan",v:"Levi's Stadium",c:"Santa Clara, CA",s:"Group Stage",fh:"🇦🇹",fa:"🇯🇴"},
+  {id:57,g:"J",d:"2026-06-22",t:"13:00",h:"Argentina",a:"Austria",v:"AT&T Stadium",c:"Arlington, TX",s:"Group Stage",fh:"🇦🇷",fa:"🇦🇹"},
+  {id:58,g:"J",d:"2026-06-22",t:"23:00",h:"Jordan",a:"Algeria",v:"Levi's Stadium",c:"Santa Clara, CA",s:"Group Stage",fh:"🇯🇴",fa:"🇩🇿"},
+  {id:59,g:"J",d:"2026-06-27",t:"22:00",h:"Jordan",a:"Argentina",v:"Arrowhead Stadium",c:"Kansas City, MO",s:"Group Stage",fh:"🇯🇴",fa:"🇦🇷"},
+  {id:60,g:"J",d:"2026-06-27",t:"22:00",h:"Algeria",a:"Austria",v:"AT&T Stadium",c:"Arlington, TX",s:"Group Stage",fh:"🇩🇿",fa:"🇦🇹"},
+  // ── GROUP K ───────────────────────────────────────────────────────────────────
+  {id:61,g:"K",d:"2026-06-17",t:"13:00",h:"Portugal",a:"DR Congo",v:"NRG Stadium",c:"Houston, TX",s:"Group Stage",fh:"🇵🇹",fa:"🇨🇩"},
+  {id:62,g:"K",d:"2026-06-17",t:"22:00",h:"Uzbekistan",a:"Colombia",v:"Estadio Azteca",c:"Mexico City, MEX",s:"Group Stage",fh:"🇺🇿",fa:"🇨🇴"},
+  {id:63,g:"K",d:"2026-06-23",t:"13:00",h:"Portugal",a:"Uzbekistan",v:"NRG Stadium",c:"Houston, TX",s:"Group Stage",fh:"🇵🇹",fa:"🇺🇿"},
+  {id:64,g:"K",d:"2026-06-23",t:"22:00",h:"Colombia",a:"DR Congo",v:"Estadio Akron",c:"Guadalajara, MEX",s:"Group Stage",fh:"🇨🇴",fa:"🇨🇩"},
+  {id:65,g:"K",d:"2026-06-27",t:"19:30",h:"Colombia",a:"Portugal",v:"Hard Rock Stadium",c:"Miami, FL",s:"Group Stage",fh:"🇨🇴",fa:"🇵🇹"},
+  {id:66,g:"K",d:"2026-06-27",t:"19:30",h:"DR Congo",a:"Uzbekistan",v:"Mercedes-Benz Stadium",c:"Atlanta, GA",s:"Group Stage",fh:"🇨🇩",fa:"🇺🇿"},
+  // ── GROUP L ───────────────────────────────────────────────────────────────────
+  {id:67,g:"L",d:"2026-06-17",t:"16:00",h:"England",a:"Croatia",v:"AT&T Stadium",c:"Arlington, TX",s:"Group Stage",fh:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",fa:"🇭🇷"},
+  {id:68,g:"L",d:"2026-06-17",t:"19:00",h:"Ghana",a:"Panama",v:"BMO Field",c:"Toronto, CAN",s:"Group Stage",fh:"🇬🇭",fa:"🇵🇦"},
+  {id:69,g:"L",d:"2026-06-23",t:"16:00",h:"England",a:"Ghana",v:"Gillette Stadium",c:"Foxborough, MA",s:"Group Stage",fh:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",fa:"🇬🇭"},
+  {id:70,g:"L",d:"2026-06-23",t:"19:00",h:"Panama",a:"Croatia",v:"BMO Field",c:"Toronto, CAN",s:"Group Stage",fh:"🇵🇦",fa:"🇭🇷"},
+  {id:71,g:"L",d:"2026-06-27",t:"17:00",h:"Panama",a:"England",v:"MetLife Stadium",c:"East Rutherford, NJ",s:"Group Stage",fh:"🇵🇦",fa:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  {id:72,g:"L",d:"2026-06-27",t:"17:00",h:"Croatia",a:"Ghana",v:"Lincoln Financial Field",c:"Philadelphia, PA",s:"Group Stage",fh:"🇭🇷",fa:"🇬🇭"},
+  // ── ROUND OF 32 ───────────────────────────────────────────────────────────────
+  {id:73,g:"R32",d:"2026-06-28",t:"15:00",h:"2nd Group A",a:"2nd Group B",v:"SoFi Stadium",c:"Inglewood, CA",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:74,g:"R32",d:"2026-06-29",t:"13:00",h:"1st Group C",a:"2nd Group F",v:"NRG Stadium",c:"Houston, TX",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:75,g:"R32",d:"2026-06-29",t:"16:30",h:"1st Group E",a:"3rd Place TBD",v:"Gillette Stadium",c:"Foxborough, MA",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:76,g:"R32",d:"2026-06-29",t:"21:00",h:"1st Group F",a:"2nd Group C",v:"Estadio BBVA",c:"Monterrey, MEX",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:77,g:"R32",d:"2026-06-30",t:"13:00",h:"2nd Group E",a:"2nd Group I",v:"AT&T Stadium",c:"Arlington, TX",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:78,g:"R32",d:"2026-06-30",t:"17:00",h:"1st Group I",a:"3rd Place TBD",v:"MetLife Stadium",c:"East Rutherford, NJ",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:79,g:"R32",d:"2026-06-30",t:"21:00",h:"1st Group A",a:"3rd Place TBD",v:"Estadio Azteca",c:"Mexico City, MEX",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:80,g:"R32",d:"2026-07-01",t:"12:00",h:"1st Group L",a:"3rd Place TBD",v:"Mercedes-Benz Stadium",c:"Atlanta, GA",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:81,g:"R32",d:"2026-07-01",t:"16:00",h:"1st Group G",a:"3rd Place TBD",v:"Lumen Field",c:"Seattle, WA",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:82,g:"R32",d:"2026-07-01",t:"20:00",h:"1st Group D",a:"3rd Place TBD",v:"Levi's Stadium",c:"Santa Clara, CA",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:83,g:"R32",d:"2026-07-02",t:"15:00",h:"1st Group H",a:"2nd Group J",v:"SoFi Stadium",c:"Inglewood, CA",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:84,g:"R32",d:"2026-07-02",t:"19:00",h:"2nd Group K",a:"2nd Group L",v:"BMO Field",c:"Toronto, CAN",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:85,g:"R32",d:"2026-07-02",t:"23:00",h:"1st Group B",a:"3rd Place TBD",v:"BC Place",c:"Vancouver, CAN",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:86,g:"R32",d:"2026-07-03",t:"14:00",h:"2nd Group D",a:"2nd Group G",v:"AT&T Stadium",c:"Arlington, TX",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:87,g:"R32",d:"2026-07-03",t:"18:00",h:"1st Group J",a:"2nd Group H",v:"Hard Rock Stadium",c:"Miami, FL",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  {id:88,g:"R32",d:"2026-07-03",t:"21:30",h:"1st Group K",a:"3rd Place TBD",v:"Arrowhead Stadium",c:"Kansas City, MO",s:"Round of 32",fh:"⚽",fa:"⚽"},
+  // ── ROUND OF 16 ───────────────────────────────────────────────────────────────
+  {id:89,g:"R16",d:"2026-07-04",t:"13:00",h:"R16-M1",a:"R16-M3 Winner",v:"NRG Stadium",c:"Houston, TX",s:"Round of 16",fh:"⚽",fa:"⚽"},
+  {id:90,g:"R16",d:"2026-07-04",t:"17:00",h:"R16-M2",a:"R16-M5 Winner",v:"Lincoln Financial Field",c:"Philadelphia, PA",s:"Round of 16",fh:"⚽",fa:"⚽"},
+  {id:91,g:"R16",d:"2026-07-05",t:"16:00",h:"R16-M4",a:"R16-M6 Winner",v:"MetLife Stadium",c:"East Rutherford, NJ",s:"Round of 16",fh:"⚽",fa:"⚽"},
+  {id:92,g:"R16",d:"2026-07-05",t:"20:00",h:"R16-M7",a:"R16-M8 Winner",v:"Estadio Azteca",c:"Mexico City, MEX",s:"Round of 16",fh:"⚽",fa:"⚽"},
+  {id:93,g:"R16",d:"2026-07-06",t:"15:00",h:"R16-M11",a:"R16-M12 Winner",v:"AT&T Stadium",c:"Arlington, TX",s:"Round of 16",fh:"⚽",fa:"⚽"},
+  {id:94,g:"R16",d:"2026-07-06",t:"20:00",h:"R16-M9",a:"R16-M10 Winner",v:"Lumen Field",c:"Seattle, WA",s:"Round of 16",fh:"⚽",fa:"⚽"},
+  {id:95,g:"R16",d:"2026-07-07",t:"12:00",h:"R16-M14",a:"R16-M16 Winner",v:"Mercedes-Benz Stadium",c:"Atlanta, GA",s:"Round of 16",fh:"⚽",fa:"⚽"},
+  {id:96,g:"R16",d:"2026-07-07",t:"16:00",h:"R16-M13",a:"R16-M15 Winner",v:"BC Place",c:"Vancouver, CAN",s:"Round of 16",fh:"⚽",fa:"⚽"},
+  // ── QUARTERFINALS ─────────────────────────────────────────────────────────────
+  {id:97,g:"QF",d:"2026-07-09",t:"16:00",h:"QF1",a:"",v:"Gillette Stadium",c:"Foxborough, MA",s:"Quarterfinal",fh:"⚽",fa:"⚽"},
+  {id:98,g:"QF",d:"2026-07-10",t:"15:00",h:"QF2",a:"",v:"SoFi Stadium",c:"Inglewood, CA",s:"Quarterfinal",fh:"⚽",fa:"⚽"},
+  {id:99,g:"QF",d:"2026-07-11",t:"17:00",h:"QF3",a:"",v:"Hard Rock Stadium",c:"Miami, FL",s:"Quarterfinal",fh:"⚽",fa:"⚽"},
+  {id:100,g:"QF",d:"2026-07-11",t:"21:00",h:"QF4",a:"",v:"Arrowhead Stadium",c:"Kansas City, MO",s:"Quarterfinal",fh:"⚽",fa:"⚽"},
+  // ── SEMIFINALS ────────────────────────────────────────────────────────────────
+  {id:101,g:"SF",d:"2026-07-14",t:"15:00",h:"Semifinal 1",a:"",v:"AT&T Stadium",c:"Arlington, TX",s:"Semifinal",fh:"⚽",fa:"⚽"},
+  {id:102,g:"SF",d:"2026-07-15",t:"15:00",h:"Semifinal 2",a:"",v:"Mercedes-Benz Stadium",c:"Atlanta, GA",s:"Semifinal",fh:"⚽",fa:"⚽"},
+  // ── 3RD PLACE + FINAL ─────────────────────────────────────────────────────────
+  {id:103,g:"3P",d:"2026-07-18",t:"17:00",h:"3rd Place Match",a:"",v:"Hard Rock Stadium",c:"Miami, FL",s:"Third Place",fh:"🥉",fa:"🥉"},
+  {id:104,g:"FIN",d:"2026-07-19",t:"15:00",h:"THE FINAL",a:"",v:"MetLife Stadium",c:"East Rutherford, NJ",s:"Final",fh:"🏆",fa:"🏆"},
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let savedIds = new Set();
+let addedIds = new Set();  // added to Google Calendar via API
+let stageFilter = 'all';
+let groupFilter = 'all';
+let searchQ = '';
+let modalId = null;
+
+// GAPI / GIS state
+let gapiInited = false;
+let gisInited = false;
+let tokenClient = null;
+const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
+const SCOPES = 'https://www.googleapis.com/auth/calendar';
+
+// ═══════════════════════════════════════════════════════
+// LOGGING
+// ═══════════════════════════════════════════════════════
+function log(msg, type='info') {
+  const body = document.getElementById('logBody');
+  const now = new Date().toTimeString().slice(0,8);
+  const div = document.createElement('div');
+  div.className = 'log-entry';
+  div.innerHTML = `<span class="log-time">${now}</span><span class="log-msg log-${type}">${msg}</span>`;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+document.getElementById('clearLog').addEventListener('click', () => {
+  document.getElementById('logBody').innerHTML = '';
+});
+
+// ═══════════════════════════════════════════════════════
+// STEP UI
+// ═══════════════════════════════════════════════════════
+function setStep(n) {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('step' + i);
+    el.className = 'step ' + (i < n ? 'done' : i === n ? 'active' : '');
+  }
+}
+setStep(1);
+
+// ═══════════════════════════════════════════════════════
+// GCAL STATUS
+// ═══════════════════════════════════════════════════════
+function setGcalStatus(state) {
+  const dot = document.getElementById('gcalDot');
+  const txt = document.getElementById('gcalStatusText');
+  if (state === 'loading') { dot.className='gcal-dot yellow'; txt.textContent='Loading API…'; }
+  else if (state === 'ready')  { dot.className='gcal-dot yellow'; txt.textContent='Authorize to connect'; }
+  else if (state === 'auth')   { dot.className='gcal-dot green';  txt.textContent='Connected'; }
+  else                          { dot.className='gcal-dot red';    txt.textContent='Not connected'; }
+}
+
+// ═══════════════════════════════════════════════════════
+// STEP 1 → 2: LOAD API LIBRARIES
+// ═══════════════════════════════════════════════════════
+document.getElementById('loadApiBtn').addEventListener('click', async () => {
+  const clientId = document.getElementById('clientId').value.trim();
+  const apiKey   = document.getElementById('apiKey').value.trim();
+  if (!clientId || !apiKey) { toast('Enter both Client ID and API Key', 'err'); return; }
+  document.getElementById('clientId').classList.add('valid');
+  document.getElementById('apiKey').classList.add('valid');
+  setStep(2);
+  setGcalStatus('loading');
+  log('→ STEP 1: Credentials received. Loading GAPI + GIS libraries…', 'info');
+  loadGapiScript(clientId, apiKey);
+  loadGisScript(clientId);
+});
+
+function loadGapiScript(clientId, apiKey) {
+  if (document.querySelector('[data-gapi]')) {
+    log('GAPI script already in DOM — reusing', 'warn');
+    return;
+  }
+  const s = document.createElement('script');
+  s.src = 'https://apis.google.com/js/api.js';
+  s.dataset.gapi = '1';
+  s.onload = () => {
+    log('✓ GAPI library loaded (apis.google.com/js/api.js)', 'ok');
+    gapi.load('client', async () => {
+      log('→ STEP 2: Initializing gapi.client with API Key + Discovery Doc…', 'info');
+      try {
+        await gapi.client.init({ apiKey, discoveryDocs: [DISCOVERY_DOC] });
+        gapiInited = true;
+        log('✓ gapi.client initialized — Calendar API discovery doc loaded', 'ok');
+        maybeReady();
+      } catch(e) {
+        log('✗ gapi.client.init error: ' + e.message, 'err');
+        toast('GAPI init error: ' + e.message, 'err');
+      }
+    });
+  };
+  s.onerror = () => log('✗ Failed to load GAPI script', 'err');
+  document.head.appendChild(s);
+}
+
+function loadGisScript(clientId) {
+  if (document.querySelector('[data-gis]')) {
+    log('GIS script already in DOM — reusing', 'warn');
+    return;
+  }
+  const s = document.createElement('script');
+  s.src = 'https://accounts.google.com/gsi/client';
+  s.dataset.gis = '1';
+  s.onload = () => {
+    log('✓ Google Identity Services loaded (accounts.google.com/gsi/client)', 'ok');
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: SCOPES,
+      callback: handleTokenResponse,
+    });
+    gisInited = true;
+    log('✓ Token client initialized (scope: calendar)', 'ok');
+    maybeReady();
+  };
+  s.onerror = () => log('✗ Failed to load GIS script', 'err');
+  document.head.appendChild(s);
+}
+
+function maybeReady() {
+  if (!gapiInited || !gisInited) return;
+  setStep(3);
+  setGcalStatus('ready');
+  log('→ STEP 3: Both libraries ready. Requesting OAuth2 token…', 'info');
+  // Request token — triggers Google's account picker popup
+  if (gapi.client.getToken() === null) {
+    tokenClient.requestAccessToken({ prompt: 'consent' });
+  } else {
+    tokenClient.requestAccessToken({ prompt: '' });
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// STEP 3: HANDLE OAUTH TOKEN RESPONSE
+// ═══════════════════════════════════════════════════════
+function handleTokenResponse(resp) {
+  if (resp.error) {
+    log('✗ OAuth2 error: ' + resp.error + ' — ' + (resp.error_description || ''), 'err');
+    toast('Auth failed: ' + resp.error, 'err');
+    setStep(3);
+    return;
+  }
+  log('✓ OAuth2 token received — access granted to Google Calendar', 'ok');
+  log(`  Token expires in ${resp.expires_in}s · Scope: ${resp.scope}`, 'info');
+  setStep(4);
+  setGcalStatus('auth');
+  toast('Google Calendar connected! ✓', 'ok');
+  renderMatches(); // re-render to enable API buttons
+}
+
+// ═══════════════════════════════════════════════════════
+// STEP 4: CREATE CALENDAR EVENT VIA API
+// ═══════════════════════════════════════════════════════
+async function insertEventToCalendar(m) {
+  if (!gapiInited || !gisInited || gapi.client.getToken() === null) {
+    toast('Connect Google Calendar first', 'err');
+    return false;
+  }
+  const title = `⚽ ${matchTitle(m)} – FIFA World Cup 2026`;
+  const [h, min] = m.t.split(':').map(Number);
+  const startDT = new Date(m.d + 'T00:00:00');
+  startDT.setHours(h, min, 0, 0);
+  const endDT   = new Date(startDT.getTime() + 2 * 60 * 60 * 1000); // +2h
+
+  const event = {
+    summary: title,
+    location: `${m.v}, ${m.c}`,
+    description: `FIFA World Cup 2026™\nStage: ${m.s}\nVenue: ${m.v}\n${m.c}\n\nTimes listed in Eastern Time (ET). Match duration approx. 2h.`,
+    start: { dateTime: startDT.toISOString(), timeZone: 'America/New_York' },
+    end:   { dateTime: endDT.toISOString(),   timeZone: 'America/New_York' },
+    reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: 60 }] },
+    colorId: '11', // tomato
+  };
+
+  log(`→ STEP 4: Inserting event — "${title}"`, 'info');
+  log(`  POST https://www.googleapis.com/calendar/v3/calendars/primary/events`, 'info');
+
+  try {
+    const resp = await gapi.client.calendar.events.insert({ calendarId: 'primary', resource: event });
+    const created = resp.result;
+    log(`✓ Event created: ${created.summary}`, 'ok');
+    log(`  Event ID: ${created.id}`, 'ok');
+    log(`  Link: ${created.htmlLink}`, 'ok');
+    addedIds.add(m.id);
+    updateStats();
+    renderMatches();
+    return true;
+  } catch(e) {
+    const msg = e.result?.error?.message || e.message || 'Unknown error';
+    log(`✗ events.insert failed: ${msg}`, 'err');
+    toast('Calendar API error: ' + msg, 'err');
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+function matchTitle(m) { return m.a ? `${m.h} vs ${m.a}` : m.h; }
+
+function fmtDate(d) {
+  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+}
+function fmtDateLong(d) {
+  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+}
+
+function isKnockout(s) { return !['Group Stage'].includes(s); }
+function isAuthed()    { return gapiInited && gisInited && gapi.client?.getToken() !== null; }
+
+// Google Calendar link (no API needed)
+function gcalLink(m) {
+  const [h, min] = m.t.split(':').map(Number);
+  const start = new Date(m.d + 'T00:00:00');
+  start.setHours(h, min, 0, 0);
+  const end = new Date(start.getTime() + 2*60*60*1000);
+  const fmt = dt => dt.toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+  const title = encodeURIComponent(`⚽ ${matchTitle(m)} – FIFA World Cup 2026`);
+  const loc   = encodeURIComponent(`${m.v}, ${m.c}`);
+  const desc  = encodeURIComponent(`FIFA World Cup 2026 | ${m.s} | ${m.v}, ${m.c}`);
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(start)}/${fmt(end)}&details=${desc}&location=${loc}`;
+}
+
+// ICS download
+function buildIcs(matches) {
+  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//WC2026 Scheduler//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:FIFA World Cup 2026'];
+  matches.forEach(m => {
+    const [h, min] = m.t.split(':').map(Number);
+    const s = new Date(m.d + 'T00:00:00'); s.setHours(h, min, 0, 0);
+    const e = new Date(s.getTime() + 2*60*60*1000);
+    const fmt = dt => dt.toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+    lines.push('BEGIN:VEVENT',
+      `SUMMARY:⚽ ${matchTitle(m)} – FIFA World Cup 2026`,
+      `DTSTART:${fmt(s)}`, `DTEND:${fmt(e)}`,
+      `LOCATION:${m.v}, ${m.c}`,
+      `DESCRIPTION:FIFA World Cup 2026 | ${m.s}`,
+      `UID:wc2026-match-${m.id}@worldcup2026app`,
+      'END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  return lines.join('\r\n');
+}
+function dlIcs(matches, name='wc2026.ics') {
+  const b = new Blob([buildIcs(matches)], { type:'text/calendar' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+function toast(msg, type='ok') {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = (type==='ok'?'✓ ':type==='err'?'✕ ':'ℹ ') + msg;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(8px)'; setTimeout(()=>t.remove(),300); }, 2800);
+}
+
+// ═══════════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════════
+function updateStats() {
+  document.getElementById('statSaved').textContent = savedIds.size;
+  document.getElementById('statAdded').textContent = addedIds.size;
+  document.getElementById('badgeDot').textContent  = savedIds.size;
+  document.getElementById('badgeDot').classList.toggle('on', savedIds.size > 0);
+  document.getElementById('panelCount').textContent = savedIds.size;
+}
+
+// ═══════════════════════════════════════════════════════
+// FILTER
+// ═══════════════════════════════════════════════════════
+function filtered() {
+  return MATCHES.filter(m => {
+    const q = searchQ.toLowerCase();
+    const matchSearch = !q ||
+      m.h.toLowerCase().includes(q) || m.a.toLowerCase().includes(q) ||
+      m.v.toLowerCase().includes(q) || m.c.toLowerCase().includes(q) || m.s.toLowerCase().includes(q);
+    const matchStage = stageFilter==='all' ? true :
+      stageFilter==='Group Stage' ? m.s==='Group Stage' :
+      stageFilter==='knockout'    ? isKnockout(m.s) :
+      stageFilter==='saved'       ? savedIds.has(m.id) : true;
+    const matchGroup = groupFilter==='all' ? true : m.g===groupFilter;
+    return matchSearch && matchStage && matchGroup;
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER MATCHES
+// ═══════════════════════════════════════════════════════
+function renderMatches() {
+  const list = filtered();
+  document.getElementById('statShow').textContent = list.length;
+  const out = document.getElementById('matchesOut');
+
+  if (!list.length) {
+    out.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p style="color:var(--tx2);font-size:var(--sm)">No matches found.</p></div>`;
+    return;
+  }
+
+  const stageOrder = ['Group Stage','Round of 32','Round of 16','Quarterfinal','Semifinal','Third Place','Final'];
+  const icons      = {'Group Stage':'⚽','Round of 32':'🔥','Round of 16':'💥','Quarterfinal':'🌟','Semifinal':'🚀','Third Place':'🥉','Final':'🏆'};
+  const sections   = {};
+  list.forEach(m => { if(!sections[m.s]) sections[m.s]={matches:[]}; sections[m.s].matches.push(m); });
+
+  let html = '';
+  stageOrder.forEach(s => {
+    if (!sections[s]) return;
+    const sec = sections[s];
+    html += `<div class="sec-head"><span class="sec-icon">${icons[s]||'⚽'}</span><div><div class="sec-title">${s}</div><div class="sec-sub">${sec.matches.length} match${sec.matches.length!==1?'es':''}</div></div></div>`;
+    if (s === 'Group Stage') {
+      const grps = {};
+      sec.matches.forEach(m => { if(!grps[m.g]) grps[m.g]=[]; grps[m.g].push(m); });
+      Object.keys(grps).sort().forEach(g => {
+        html += `<div class="grp-sec"><div class="grp-head"><span class="grp-badge">Group ${g}</span><span class="grp-lbl">${grps[g].length} matches</span><div class="grp-line"></div></div><div class="grid">`;
+        grps[g].forEach(m => { html += card(m); });
+        html += `</div></div>`;
+      });
+    } else {
+      html += `<div class="grid" style="margin-bottom:var(--s8)">`;
+      sec.matches.forEach(m => { html += card(m); });
+      html += `</div>`;
+    }
+  });
+
+  out.innerHTML = html;
+  // bind events
+  out.querySelectorAll('[data-save]').forEach(b => b.addEventListener('click', () => toggleSave(+b.dataset.save)));
+  out.querySelectorAll('[data-cal]').forEach(b => b.addEventListener('click',  () => openModal(+b.dataset.cal)));
+  lucide.createIcons();
+}
+
+function card(m) {
+  const saved = savedIds.has(m.id);
+  const added = addedIds.has(m.id);
+  const ko    = isKnockout(m.s);
+  const fin   = m.s === 'Final';
+  const authed = isAuthed();
+  const stageLabel = m.g==='FIN'?'🏆 FINAL':m.g==='3P'?'3rd Place':m.g==='SF'?'Semi':m.g==='QF'?'QF':m.g.length>2?m.g:'Grp '+m.g;
+  return `<div class="card${saved?' saved':''}${added?' adding':''}" data-id="${m.id}">
+    <div class="card-meta">
+      <span class="badge${fin?' fin':ko?' ko':''}">${stageLabel}</span>
+      <span class="card-date">${fmtDate(m.d)} · ${m.t} ET</span>
+    </div>
+    <div class="teams">
+      <div class="team"><span class="flag">${m.fh}</span><span class="tname">${m.h}</span></div>
+      <span class="vs">VS</span>
+      <div class="team away"><span class="flag">${m.fa}</span><span class="tname">${m.a||'TBD'}</span></div>
+    </div>
+    <div class="venue"><i data-lucide="map-pin" style="width:11px;height:11px;flex-shrink:0"></i>${m.v} · ${m.c}</div>
+    <div class="actions">
+      <button class="btn ${saved?'btn-ok':'btn-out'} btn-sm" data-save="${m.id}" aria-label="${saved?'Remove':'Save'}">
+        <i data-lucide="${saved?'calendar-check':'calendar-plus'}" style="width:12px;height:12px"></i>${saved?'Saved':'Save'}
+      </button>
+      <button class="btn btn-gcal btn-sm" data-cal="${m.id}" aria-label="Add to calendar">
+        <i data-lucide="calendar" style="width:12px;height:12px"></i>${added?'✓ Added':'+ Calendar'}
+      </button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// SAVE TOGGLE
+// ═══════════════════════════════════════════════════════
+function toggleSave(id) {
+  if (savedIds.has(id)) { savedIds.delete(id); toast('Removed from saved', 'err'); }
+  else                  { savedIds.add(id);    toast('Match saved!'); }
+  updateStats();
+  renderMatches();
+  renderPanel();
+}
+
+// ═══════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════
+function openModal(id) {
+  modalId = id;
+  const m = MATCHES.find(x => x.id === id);
+  document.getElementById('modalInfo').innerHTML = `
+    <div class="modal-teams">${m.fh} ${matchTitle(m)} ${m.fa}</div>
+    <div class="modal-meta">${fmtDateLong(m.d)} · ${m.t} ET<br>${m.v}, ${m.c}<br><strong>${m.s}</strong></div>
+  `;
+  // Show/dim API option based on auth state
+  const apiOpt = document.getElementById('optGcal');
+  if (!isAuthed()) {
+    apiOpt.style.opacity = '0.45';
+    apiOpt.title = 'Connect Google Calendar first';
+  } else {
+    apiOpt.style.opacity = '1';
+    apiOpt.title = '';
+  }
+  document.getElementById('modalBg').classList.add('on');
+}
+
+document.getElementById('optGcal').addEventListener('click', async () => {
+  if (!isAuthed()) { toast('Connect Google Calendar first (enter credentials above)', 'err'); return; }
+  const m = MATCHES.find(x => x.id === modalId);
+  document.getElementById('modalBg').classList.remove('on');
+  toast('Adding to Google Calendar…', 'info');
+  const ok = await insertEventToCalendar(m);
+  if (ok) toast(`"${matchTitle(m)}" added to calendar ✓`);
+});
+
+document.getElementById('optLink').addEventListener('click', () => {
+  const m = MATCHES.find(x => x.id === modalId);
+  window.open(gcalLink(m), '_blank', 'noopener,noreferrer');
+  document.getElementById('modalBg').classList.remove('on');
+  toast('Opening Google Calendar…');
+});
+
+document.getElementById('optIcs').addEventListener('click', () => {
+  const m = MATCHES.find(x => x.id === modalId);
+  dlIcs([m], `wc2026-match-${m.id}.ics`);
+  document.getElementById('modalBg').classList.remove('on');
+  toast('.ics downloaded!');
+});
+
+document.getElementById('closeModal').addEventListener('click', () => document.getElementById('modalBg').classList.remove('on'));
+document.getElementById('modalBg').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('on'); });
+
+// ═══════════════════════════════════════════════════════
+// SIDE PANEL
+// ═══════════════════════════════════════════════════════
+function renderPanel() {
+  const body = document.getElementById('panelBody');
+  if (!savedIds.size) {
+    body.innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div><p style="color:var(--tx2);font-size:var(--sm)">No matches saved yet.</p></div>`;
+    return;
+  }
+  body.innerHTML = MATCHES.filter(m=>savedIds.has(m.id)).map(m => `
+    <div class="saved-item">
+      <div style="font-size:1.4rem">${m.fh}</div>
+      <div class="saved-info">
+        <div class="saved-title">${matchTitle(m)}</div>
+        <div class="saved-meta">${fmtDate(m.d)} · ${m.t} ET · ${m.v}</div>
+        ${addedIds.has(m.id)?'<div class="saved-added">✓ Added to Google Calendar</div>':''}
+      </div>
+      <button class="btn btn-out btn-icon btn-sm" data-save="${m.id}" aria-label="Remove"><i data-lucide="x" style="width:13px;height:13px"></i></button>
+    </div>
+  `).join('');
+  body.querySelectorAll('[data-save]').forEach(b => b.addEventListener('click', () => { toggleSave(+b.dataset.save); renderPanel(); }));
+  lucide.createIcons();
+}
+
+document.getElementById('panelBtn').addEventListener('click', () => { document.getElementById('panel').classList.add('open'); document.getElementById('overlay').classList.add('on'); });
+document.getElementById('closePanel').addEventListener('click', closePanel);
+document.getElementById('overlay').addEventListener('click', closePanel);
+function closePanel() { document.getElementById('panel').classList.remove('open'); document.getElementById('overlay').classList.remove('on'); }
+
+document.getElementById('addAllGcal').addEventListener('click', async () => {
+  if (!isAuthed()) { toast('Connect Google Calendar first', 'err'); return; }
+  const list = MATCHES.filter(m => savedIds.has(m.id) && !addedIds.has(m.id));
+  if (!list.length) { toast('All saved matches already added!', 'info'); return; }
+  toast(`Adding ${list.length} matches…`, 'info');
+  log(`→ Batch inserting ${list.length} events…`, 'info');
+  let ok = 0;
+  for (const m of list) {
+    const res = await insertEventToCalendar(m);
+    if (res) ok++;
+    await new Promise(r => setTimeout(r, 400)); // rate-limit courtesy delay
+  }
+  toast(`${ok}/${list.length} matches added ✓`);
+  renderPanel();
+});
+
+document.getElementById('exportIcsAll').addEventListener('click', () => {
+  if (!savedIds.size) { toast('No saved matches', 'err'); return; }
+  dlIcs(MATCHES.filter(m=>savedIds.has(m.id)), 'wc2026-saved-matches.ics');
+  toast('.ics file downloaded!');
+});
+
+document.getElementById('clearSaved').addEventListener('click', () => {
+  savedIds.clear();
+  updateStats();
+  renderMatches();
+  renderPanel();
+  toast('Cleared all saved', 'err');
+});
+
+// ═══════════════════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════════════════
+document.getElementById('searchInput').addEventListener('input', e => { searchQ = e.target.value; renderMatches(); lucide.createIcons(); });
+
+document.getElementById('stagePills').addEventListener('click', e => {
+  const b = e.target.closest('[data-s]');
+  if (!b) return;
+  stageFilter = b.dataset.s;
+  document.querySelectorAll('#stagePills .pill').forEach(p => p.classList.toggle('on', p===b));
+  const gs = document.getElementById('groupSel');
+  gs.disabled = (stageFilter==='knockout'||stageFilter==='saved');
+  gs.style.opacity = gs.disabled ? '0.4' : '1';
+  renderMatches();
+  lucide.createIcons();
+});
+
+document.getElementById('groupSel').addEventListener('change', e => { groupFilter = e.target.value; renderMatches(); lucide.createIcons(); });
+
+// ═══════════════════════════════════════════════════════
+// THEME TOGGLE
+// ═══════════════════════════════════════════════════════
+(function(){
+  const btn = document.querySelector('[data-theme-toggle]');
+  const root = document.documentElement;
+  let d = root.getAttribute('data-theme') || 'dark';
+  const sun='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+  const moon='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  btn.innerHTML = d==='dark' ? sun : moon;
+  btn.addEventListener('click', () => {
+    d = d==='dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', d);
+    btn.innerHTML = d==='dark' ? sun : moon;
+  });
+})();
+
+// ═══════════════════════════════════════════════════════
+// DAYS TO GO
+// ═══════════════════════════════════════════════════════
+(function(){
+  const wc = new Date('2026-06-11T00:00:00');
+  const days = Math.max(0, Math.ceil((wc - new Date()) / 86400000));
+  document.getElementById('daysKpi').textContent = days;
+})();
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+renderMatches();
+lucide.createIcons();
+</script>
+</body>
+</html>
