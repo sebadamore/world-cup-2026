@@ -127,7 +127,8 @@ All times shown in Eastern Time (ET).
 
 ```
 world-cup-2026/
-├── index.html                    # Vercel/GitHub Pages entrypoint
+├── index.html                    # Local static entrypoint (optional redirect)
+├── vercel.json                   # Routes / to main app on Vercel
 ├── World_Cup_2026_App.html       # Main app (single-file)
 └── World Cup Games App README.md
 ```

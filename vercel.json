@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/World_Cup_2026_App.html"
+    }
+  ]
+}
